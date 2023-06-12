@@ -21,7 +21,7 @@ COPY . ./
 
 RUN go generate
 
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o ${APP_EXECUTABLE} ./terraform
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o ${APP_EXECUTABLE} .
 
 FROM docker.io/alpine/terragrunt:1.4.6 as terraform
 
