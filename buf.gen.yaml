@@ -1,0 +1,21 @@
+version: v1
+managed:
+  enabled: true
+  go_package_prefix:
+    default: github.com/protomesh/terraform-provider-protomesh/proto
+    except:
+      - buf.build/protomesh/protoc-gen-terraform
+      - buf.build/googleapis/googleapis
+plugins:
+  - name: terraform
+    out: proto
+    opt:
+      - paths=source_relative
+  - name: go
+    out: proto
+    opt:
+      - paths=source_relative
+  - name: go-grpc
+    out: proto
+    opt:
+      - paths=source_relative
