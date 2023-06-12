@@ -111,31 +111,31 @@ func Provider() *schema.Provider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
 			"address": {
-				Description: "Address of the Protomesh resource store gRPC server to manage resources",
+				Description: "Address of the Protomesh resource store gRPC server to manage resources. Default to localhost:6680.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("PROTOMESH_STORE_ADDRESS", "localhost:6680"),
 			},
 			"enable_tls": {
-				Description: "Enable in the Protomesh resource store connection",
+				Description: "Enable in the Protomesh resource store connection, default **false**.",
 				Type:        schema.TypeBool,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("PROTOMESH_ENABLE_TLS", false),
 			},
 			"server_name_override": {
-				Description: "Override server name in the TLS handshake",
+				Description: "Override server name in the TLS handshake, default nil.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("PROTOMESH_STORE_SERVER_NAME_OVERRIDE", nil),
 			},
 			"tls_certificate_path": {
-				Description: "Client TLS certificate path",
+				Description: "Client TLS certificate path default nil.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("PROTOMESH_TLS_CERTIFICATE_PATH", nil),
 			},
 			"tls_private_key_path": {
-				Description: "Client TLS private key path",
+				Description: "Client TLS private key path default nil.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("PROTOMESH_TLS_PRIVATE_KEY_PATH", nil),

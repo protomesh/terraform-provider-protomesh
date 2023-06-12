@@ -16,7 +16,7 @@ func DataSourceInstanceSet() *schema.Resource {
 
 func ResourceInstanceSet() *schema.Resource {
 	return &schema.Resource{
-		Description:   "Expose a AWS Lambda through a gRPC interface",
+		Description:   "Instance set is a group of instances serving the same service through a well known port.",
 		CreateContext: createInstanceSet,
 		ReadContext:   readInstanceSet,
 		UpdateContext: updateInstanceSet,

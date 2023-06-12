@@ -16,7 +16,7 @@ func DataSourceHttpIngress() *schema.Resource {
 
 func ResourceHttpIngress() *schema.Resource {
 	return &schema.Resource{
-		Description:   "Expose a AWS Lambda through a gRPC interface",
+		Description:   "HTTP Ingress (a.k.a reverse proxy). Usually this ingress is the upstream of a network load balancer.",
 		CreateContext: createHttpIngress,
 		ReadContext:   readHttpIngress,
 		UpdateContext: updateHttpIngress,

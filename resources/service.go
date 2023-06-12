@@ -16,7 +16,7 @@ func DataSourceService() *schema.Resource {
 
 func ResourceService() *schema.Resource {
 	return &schema.Resource{
-		Description:   "Expose a AWS Lambda through a gRPC interface",
+		Description:   "Service defines an upstream cluster to receive routed requests from HTTP Ingress.",
 		CreateContext: createService,
 		ReadContext:   readService,
 		UpdateContext: updateService,

@@ -10,418 +10,6 @@ import (
 	"encoding/json"
 )
 
-func NewInstanceSetSchema() map[string]*schema.Schema {
-	return map[string]*schema.Schema{
-		"instances": {
-			Type:     schema.TypeList,
-			Optional: true,
-			Elem: &schema.Resource{
-				Schema: NewInstanceSetInstanceSchema(),
-			},
-		},
-		"match_service_names": {
-			Type:     schema.TypeList,
-			Optional: true,
-			Elem: &schema.Schema{
-				Type: schema.TypeString,
-			},
-		},
-	}
-}
-
-func UnmarshalInstanceSet(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	if valueInstances, okInstances := obj["instances"].([]interface{}); okInstances {
-		list := valueInstances
-		r := []map[string]interface{}{}
-		for _, val := range list {
-			m, err := UnmarshalInstanceSetInstance(val.(map[string]interface{}))
-			if err != nil {
-				return nil, err
-			}
-			r = append(r, m)
-		}
-		p["instances"] = r
-	}
-	if valueMatchServiceNames, okMatchServiceNames := obj["match_service_names"].([]interface{}); okMatchServiceNames {
-		list := valueMatchServiceNames
-		r := []string{}
-		for _, val := range list {
-			r = append(r, val.(string))
-		}
-		p["match_service_names"] = r
-	}
-	return p, nil
-}
-
-func UnmarshalInstanceSetProto(obj map[string]interface{}, m proto.Message) error {
-	d, err := UnmarshalInstanceSet(obj)
-	if err != nil {
-		return err
-	}
-	b, err := json.Marshal(d)
-	if err != nil {
-		return err
-	}
-	if err := protojson.Unmarshal(b, m); err != nil {
-		return err
-	}
-	return nil
-}
-
-func MarshalInstanceSet(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	if l, ok := obj["instances"].([]interface{}); ok {
-		p["instances"] = []interface{}{}
-		for _, i := range l {
-			d, err := MarshalInstanceSetInstance(i.(map[string]interface{}))
-			if err != nil {
-				return nil, err
-			}
-			p["instances"] = append(p["instances"].([]interface{}), d)
-		}
-	}
-	if l, ok := obj["match_service_names"].([]interface{}); ok {
-		p["match_service_names"] = []interface{}{}
-		for _, i := range l {
-			d := i.(string)
-			p["match_service_names"] = append(p["match_service_names"].([]interface{}), d)
-		}
-	}
-	return p, nil
-}
-
-func MarshalInstanceSetProto(m proto.Message) (map[string]interface{}, error) {
-	obj := map[string]interface{}{}
-	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(b, &obj)
-	if err != nil {
-		return nil, err
-	}
-	return MarshalInstanceSet(obj)
-}
-
-func NewServiceHttp1OptionsSchema() map[string]*schema.Schema {
-	return map[string]*schema.Schema{}
-}
-
-func UnmarshalServiceHttp1Options(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	return p, nil
-}
-
-func UnmarshalServiceHttp1OptionsProto(obj map[string]interface{}, m proto.Message) error {
-	d, err := UnmarshalServiceHttp1Options(obj)
-	if err != nil {
-		return err
-	}
-	b, err := json.Marshal(d)
-	if err != nil {
-		return err
-	}
-	if err := protojson.Unmarshal(b, m); err != nil {
-		return err
-	}
-	return nil
-}
-
-func MarshalServiceHttp1Options(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	return p, nil
-}
-
-func MarshalServiceHttp1OptionsProto(m proto.Message) (map[string]interface{}, error) {
-	obj := map[string]interface{}{}
-	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(b, &obj)
-	if err != nil {
-		return nil, err
-	}
-	return MarshalServiceHttp1Options(obj)
-}
-
-func NewHttpFilterSchema() map[string]*schema.Schema {
-	return map[string]*schema.Schema{
-		"filter": {
-			Type:     schema.TypeList,
-			MaxItems: 1,
-			Optional: true,
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-					"cors": {
-						Type:     schema.TypeList,
-						MaxItems: 1,
-						Optional: true,
-						Elem: &schema.Resource{
-							Schema: NewHttpFilterCorsSchema(),
-						},
-					},
-					"health_check": {
-						Type:     schema.TypeList,
-						MaxItems: 1,
-						Optional: true,
-						Elem: &schema.Resource{
-							Schema: NewHttpFilterHealthCheckSchema(),
-						},
-					},
-					"grpc_web": {
-						Type:     schema.TypeList,
-						MaxItems: 1,
-						Optional: true,
-						Elem: &schema.Resource{
-							Schema: NewHttpFilterGrpcWebSchema(),
-						},
-					},
-					"jwt_authn": {
-						Type:     schema.TypeList,
-						MaxItems: 1,
-						Optional: true,
-						Elem: &schema.Resource{
-							Schema: NewHttpFilterJwtAuthnSchema(),
-						},
-					},
-				},
-			},
-		},
-	}
-}
-
-func UnmarshalHttpFilter(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	if valueFilter, okFilter := obj["filter"].([]interface{}); okFilter && len(valueFilter) > 0 {
-		o := valueFilter[0].(map[string]interface{})
-		if oneOfVal, ok := o["cors"]; ok {
-			if valueCorsCollection, okCors := oneOfVal.([]interface{}); okCors && len(valueCorsCollection) > 0 {
-				if valueCors, okCors := valueCorsCollection[0].(map[string]interface{}); okCors {
-					msg, err := UnmarshalHttpFilterCors(valueCors)
-					if err != nil {
-						return nil, err
-					}
-					p["cors"] = msg
-				}
-			}
-		} else if oneOfVal, ok := o["health_check"]; ok {
-			if valueHealthCheckCollection, okHealthCheck := oneOfVal.([]interface{}); okHealthCheck && len(valueHealthCheckCollection) > 0 {
-				if valueHealthCheck, okHealthCheck := valueHealthCheckCollection[0].(map[string]interface{}); okHealthCheck {
-					msg, err := UnmarshalHttpFilterHealthCheck(valueHealthCheck)
-					if err != nil {
-						return nil, err
-					}
-					p["health_check"] = msg
-				}
-			}
-		} else if oneOfVal, ok := o["grpc_web"]; ok {
-			if valueGrpcWebCollection, okGrpcWeb := oneOfVal.([]interface{}); okGrpcWeb && len(valueGrpcWebCollection) > 0 {
-				if valueGrpcWeb, okGrpcWeb := valueGrpcWebCollection[0].(map[string]interface{}); okGrpcWeb {
-					msg, err := UnmarshalHttpFilterGrpcWeb(valueGrpcWeb)
-					if err != nil {
-						return nil, err
-					}
-					p["grpc_web"] = msg
-				}
-			}
-		} else if oneOfVal, ok := o["jwt_authn"]; ok {
-			if valueJwtAuthnCollection, okJwtAuthn := oneOfVal.([]interface{}); okJwtAuthn && len(valueJwtAuthnCollection) > 0 {
-				if valueJwtAuthn, okJwtAuthn := valueJwtAuthnCollection[0].(map[string]interface{}); okJwtAuthn {
-					msg, err := UnmarshalHttpFilterJwtAuthn(valueJwtAuthn)
-					if err != nil {
-						return nil, err
-					}
-					p["jwt_authn"] = msg
-				}
-			}
-		}
-	}
-	return p, nil
-}
-
-func UnmarshalHttpFilterProto(obj map[string]interface{}, m proto.Message) error {
-	d, err := UnmarshalHttpFilter(obj)
-	if err != nil {
-		return err
-	}
-	b, err := json.Marshal(d)
-	if err != nil {
-		return err
-	}
-	if err := protojson.Unmarshal(b, m); err != nil {
-		return err
-	}
-	return nil
-}
-
-func MarshalHttpFilter(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	p["filter"] = []interface{}{}
-	if _, ok := obj["cors"]; ok {
-		p["filter"] = append(p["filter"].([]interface{}), map[string]interface{}{})
-		if m, ok := obj["cors"].(map[string]interface{}); ok {
-			d, err := MarshalHttpFilterCors(m)
-			if err != nil {
-				return nil, err
-			}
-			p["filter"].([]interface{})[0].(map[string]interface{})["cors"] = []interface{}{d}
-		}
-	} else if _, ok := obj["health_check"]; ok {
-		p["filter"] = append(p["filter"].([]interface{}), map[string]interface{}{})
-		if m, ok := obj["health_check"].(map[string]interface{}); ok {
-			d, err := MarshalHttpFilterHealthCheck(m)
-			if err != nil {
-				return nil, err
-			}
-			p["filter"].([]interface{})[0].(map[string]interface{})["health_check"] = []interface{}{d}
-		}
-	} else if _, ok := obj["grpc_web"]; ok {
-		p["filter"] = append(p["filter"].([]interface{}), map[string]interface{}{})
-		if m, ok := obj["grpc_web"].(map[string]interface{}); ok {
-			d, err := MarshalHttpFilterGrpcWeb(m)
-			if err != nil {
-				return nil, err
-			}
-			p["filter"].([]interface{})[0].(map[string]interface{})["grpc_web"] = []interface{}{d}
-		}
-	} else if _, ok := obj["jwt_authn"]; ok {
-		p["filter"] = append(p["filter"].([]interface{}), map[string]interface{}{})
-		if m, ok := obj["jwt_authn"].(map[string]interface{}); ok {
-			d, err := MarshalHttpFilterJwtAuthn(m)
-			if err != nil {
-				return nil, err
-			}
-			p["filter"].([]interface{})[0].(map[string]interface{})["jwt_authn"] = []interface{}{d}
-		}
-	}
-	return p, nil
-}
-
-func MarshalHttpFilterProto(m proto.Message) (map[string]interface{}, error) {
-	obj := map[string]interface{}{}
-	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(b, &obj)
-	if err != nil {
-		return nil, err
-	}
-	return MarshalHttpFilter(obj)
-}
-
-func NewHttpFilterHealthCheckSchema() map[string]*schema.Schema {
-	return map[string]*schema.Schema{
-		"path": {
-			Type:     schema.TypeString,
-			Required: true,
-		},
-	}
-}
-
-func UnmarshalHttpFilterHealthCheck(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	if valuePath, okPath := obj["path"].(string); okPath {
-		p["path"] = valuePath
-	}
-	return p, nil
-}
-
-func UnmarshalHttpFilterHealthCheckProto(obj map[string]interface{}, m proto.Message) error {
-	d, err := UnmarshalHttpFilterHealthCheck(obj)
-	if err != nil {
-		return err
-	}
-	b, err := json.Marshal(d)
-	if err != nil {
-		return err
-	}
-	if err := protojson.Unmarshal(b, m); err != nil {
-		return err
-	}
-	return nil
-}
-
-func MarshalHttpFilterHealthCheck(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	p["path"], _ = obj["path"].(string)
-	return p, nil
-}
-
-func MarshalHttpFilterHealthCheckProto(m proto.Message) (map[string]interface{}, error) {
-	obj := map[string]interface{}{}
-	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(b, &obj)
-	if err != nil {
-		return nil, err
-	}
-	return MarshalHttpFilterHealthCheck(obj)
-}
-
-func NewHttpFilterJwtAuthnClaimToHeaderSchema() map[string]*schema.Schema {
-	return map[string]*schema.Schema{
-		"header_name": {
-			Type:     schema.TypeString,
-			Optional: true,
-		},
-		"claim_name": {
-			Type:     schema.TypeString,
-			Optional: true,
-		},
-	}
-}
-
-func UnmarshalHttpFilterJwtAuthnClaimToHeader(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	if valueHeaderName, okHeaderName := obj["header_name"].(string); okHeaderName {
-		p["header_name"] = valueHeaderName
-	}
-	if valueClaimName, okClaimName := obj["claim_name"].(string); okClaimName {
-		p["claim_name"] = valueClaimName
-	}
-	return p, nil
-}
-
-func UnmarshalHttpFilterJwtAuthnClaimToHeaderProto(obj map[string]interface{}, m proto.Message) error {
-	d, err := UnmarshalHttpFilterJwtAuthnClaimToHeader(obj)
-	if err != nil {
-		return err
-	}
-	b, err := json.Marshal(d)
-	if err != nil {
-		return err
-	}
-	if err := protojson.Unmarshal(b, m); err != nil {
-		return err
-	}
-	return nil
-}
-
-func MarshalHttpFilterJwtAuthnClaimToHeader(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	p["header_name"], _ = obj["header_name"].(string)
-	p["claim_name"], _ = obj["claim_name"].(string)
-	return p, nil
-}
-
-func MarshalHttpFilterJwtAuthnClaimToHeaderProto(m proto.Message) (map[string]interface{}, error) {
-	obj := map[string]interface{}{}
-	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(b, &obj)
-	if err != nil {
-		return nil, err
-	}
-	return MarshalHttpFilterJwtAuthnClaimToHeader(obj)
-}
-
 func NewHttpFilterJwtAuthnRemoteJwksSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"http_uri": {
@@ -485,32 +73,26 @@ func MarshalHttpFilterJwtAuthnRemoteJwksProto(m proto.Message) (map[string]inter
 	return MarshalHttpFilterJwtAuthnRemoteJwks(obj)
 }
 
-func NewHttpFilterJwtAuthnFromHeaderSchema() map[string]*schema.Schema {
+func NewServiceHttp2OptionsSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
-		"header_name": {
-			Type:     schema.TypeString,
-			Required: true,
-		},
-		"value_prefix": {
-			Type:     schema.TypeString,
-			Required: true,
+		"max_concurrent_streams": {
+			Type:        schema.TypeInt,
+			Optional:    true,
+			Description: "Maximum concurrent streams allowed for peer on one HTTP/2 connection.  Valid values range from 1 to 2147483647 (2^31 - 1) and defaults to 2147483647.",
 		},
 	}
 }
 
-func UnmarshalHttpFilterJwtAuthnFromHeader(obj map[string]interface{}) (map[string]interface{}, error) {
+func UnmarshalServiceHttp2Options(obj map[string]interface{}) (map[string]interface{}, error) {
 	p := map[string]interface{}{}
-	if valueHeaderName, okHeaderName := obj["header_name"].(string); okHeaderName {
-		p["header_name"] = valueHeaderName
-	}
-	if valueValuePrefix, okValuePrefix := obj["value_prefix"].(string); okValuePrefix {
-		p["value_prefix"] = valueValuePrefix
+	if valueMaxConcurrentStreams, okMaxConcurrentStreams := obj["max_concurrent_streams"].(int32); okMaxConcurrentStreams {
+		p["max_concurrent_streams"] = valueMaxConcurrentStreams
 	}
 	return p, nil
 }
 
-func UnmarshalHttpFilterJwtAuthnFromHeaderProto(obj map[string]interface{}, m proto.Message) error {
-	d, err := UnmarshalHttpFilterJwtAuthnFromHeader(obj)
+func UnmarshalServiceHttp2OptionsProto(obj map[string]interface{}, m proto.Message) error {
+	d, err := UnmarshalServiceHttp2Options(obj)
 	if err != nil {
 		return err
 	}
@@ -524,14 +106,13 @@ func UnmarshalHttpFilterJwtAuthnFromHeaderProto(obj map[string]interface{}, m pr
 	return nil
 }
 
-func MarshalHttpFilterJwtAuthnFromHeader(obj map[string]interface{}) (map[string]interface{}, error) {
+func MarshalServiceHttp2Options(obj map[string]interface{}) (map[string]interface{}, error) {
 	p := map[string]interface{}{}
-	p["header_name"], _ = obj["header_name"].(string)
-	p["value_prefix"], _ = obj["value_prefix"].(string)
+	p["max_concurrent_streams"], _ = obj["max_concurrent_streams"].(int32)
 	return p, nil
 }
 
-func MarshalHttpFilterJwtAuthnFromHeaderProto(m proto.Message) (map[string]interface{}, error) {
+func MarshalServiceHttp2OptionsProto(m proto.Message) (map[string]interface{}, error) {
 	obj := map[string]interface{}{}
 	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
 	if err != nil {
@@ -541,89 +122,172 @@ func MarshalHttpFilterJwtAuthnFromHeaderProto(m proto.Message) (map[string]inter
 	if err != nil {
 		return nil, err
 	}
-	return MarshalHttpFilterJwtAuthnFromHeader(obj)
+	return MarshalServiceHttp2Options(obj)
 }
 
-func NewServiceSchema() map[string]*schema.Schema {
+func NewRoutingPolicyRouteSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
-		"xds_cluster_name": {
+		"match_prefix": {
 			Type:        schema.TypeString,
 			Optional:    true,
-			Description: "XDS cluster name: must be the same of the envoy config to be matched by  xDS server",
+			Description: "Path prefix in the request to match.",
 		},
-		"service_name": {
-			Type:     schema.TypeString,
-			Optional: true,
+		"target_service": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "Target service name when this route matches.",
 		},
-		"connect_timeout": {
-			Type:     schema.TypeInt,
-			Optional: true,
+		"timeout": {
+			Type:        schema.TypeInt,
+			Optional:    true,
+			Description: "Timeout to connect to service in this route.",
 		},
-		"instance_application_protocol_options": {
-			Type:     schema.TypeList,
-			MaxItems: 1,
-			Optional: true,
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-					"instance_http1_options": {
-						Type:     schema.TypeList,
-						MaxItems: 1,
-						Optional: true,
-						Elem: &schema.Resource{
-							Schema: NewServiceHttp1OptionsSchema(),
-						},
-					},
-					"instance_http2_options": {
-						Type:     schema.TypeList,
-						MaxItems: 1,
-						Optional: true,
-						Elem: &schema.Resource{
-							Schema: NewServiceHttp2OptionsSchema(),
-						},
-					},
-				},
+	}
+}
+
+func UnmarshalRoutingPolicyRoute(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	if valueMatchPrefix, okMatchPrefix := obj["match_prefix"].(string); okMatchPrefix {
+		p["match_prefix"] = valueMatchPrefix
+	}
+	if valueTargetService, okTargetService := obj["target_service"].(string); okTargetService {
+		p["target_service"] = valueTargetService
+	}
+	return p, nil
+}
+
+func UnmarshalRoutingPolicyRouteProto(obj map[string]interface{}, m proto.Message) error {
+	d, err := UnmarshalRoutingPolicyRoute(obj)
+	if err != nil {
+		return err
+	}
+	b, err := json.Marshal(d)
+	if err != nil {
+		return err
+	}
+	if err := protojson.Unmarshal(b, m); err != nil {
+		return err
+	}
+	return nil
+}
+
+func MarshalRoutingPolicyRoute(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	p["match_prefix"], _ = obj["match_prefix"].(string)
+	p["target_service"], _ = obj["target_service"].(string)
+	return p, nil
+}
+
+func MarshalRoutingPolicyRouteProto(m proto.Message) (map[string]interface{}, error) {
+	obj := map[string]interface{}{}
+	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(b, &obj)
+	if err != nil {
+		return nil, err
+	}
+	return MarshalRoutingPolicyRoute(obj)
+}
+
+func NewHttpFilterJwtAuthnClaimToHeaderSchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		"header_name": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "HeaderName is the header name to put the acquired value.",
+		},
+		"claim_name": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "ClaimName is the claim in the JWT token to acquire the value.",
+		},
+	}
+}
+
+func UnmarshalHttpFilterJwtAuthnClaimToHeader(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	if valueHeaderName, okHeaderName := obj["header_name"].(string); okHeaderName {
+		p["header_name"] = valueHeaderName
+	}
+	if valueClaimName, okClaimName := obj["claim_name"].(string); okClaimName {
+		p["claim_name"] = valueClaimName
+	}
+	return p, nil
+}
+
+func UnmarshalHttpFilterJwtAuthnClaimToHeaderProto(obj map[string]interface{}, m proto.Message) error {
+	d, err := UnmarshalHttpFilterJwtAuthnClaimToHeader(obj)
+	if err != nil {
+		return err
+	}
+	b, err := json.Marshal(d)
+	if err != nil {
+		return err
+	}
+	if err := protojson.Unmarshal(b, m); err != nil {
+		return err
+	}
+	return nil
+}
+
+func MarshalHttpFilterJwtAuthnClaimToHeader(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	p["header_name"], _ = obj["header_name"].(string)
+	p["claim_name"], _ = obj["claim_name"].(string)
+	return p, nil
+}
+
+func MarshalHttpFilterJwtAuthnClaimToHeaderProto(m proto.Message) (map[string]interface{}, error) {
+	obj := map[string]interface{}{}
+	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(b, &obj)
+	if err != nil {
+		return nil, err
+	}
+	return MarshalHttpFilterJwtAuthnClaimToHeader(obj)
+}
+
+func NewHttpFilterJwtAuthnRuleSchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		"match_prefix": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "When the path parameter matches the specified prefixes.",
+		},
+		"required_providers_names": {
+			Type:        schema.TypeList,
+			Optional:    true,
+			Description: "Then it's required that the JWT token signature is valid for at least one of  the following providers referenced by its name.",
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
 			},
 		},
 	}
 }
 
-func UnmarshalService(obj map[string]interface{}) (map[string]interface{}, error) {
+func UnmarshalHttpFilterJwtAuthnRule(obj map[string]interface{}) (map[string]interface{}, error) {
 	p := map[string]interface{}{}
-	if valueXdsClusterName, okXdsClusterName := obj["xds_cluster_name"].(string); okXdsClusterName {
-		p["xds_cluster_name"] = valueXdsClusterName
+	if valueMatchPrefix, okMatchPrefix := obj["match_prefix"].(string); okMatchPrefix {
+		p["match_prefix"] = valueMatchPrefix
 	}
-	if valueServiceName, okServiceName := obj["service_name"].(string); okServiceName {
-		p["service_name"] = valueServiceName
-	}
-	if valueInstanceApplicationProtocolOptions, okInstanceApplicationProtocolOptions := obj["instance_application_protocol_options"].([]interface{}); okInstanceApplicationProtocolOptions && len(valueInstanceApplicationProtocolOptions) > 0 {
-		o := valueInstanceApplicationProtocolOptions[0].(map[string]interface{})
-		if oneOfVal, ok := o["instance_http1_options"]; ok {
-			if valueInstanceHttp1OptionsCollection, okInstanceHttp1Options := oneOfVal.([]interface{}); okInstanceHttp1Options && len(valueInstanceHttp1OptionsCollection) > 0 {
-				if valueInstanceHttp1Options, okInstanceHttp1Options := valueInstanceHttp1OptionsCollection[0].(map[string]interface{}); okInstanceHttp1Options {
-					msg, err := UnmarshalServiceHttp1Options(valueInstanceHttp1Options)
-					if err != nil {
-						return nil, err
-					}
-					p["instance_http1_options"] = msg
-				}
-			}
-		} else if oneOfVal, ok := o["instance_http2_options"]; ok {
-			if valueInstanceHttp2OptionsCollection, okInstanceHttp2Options := oneOfVal.([]interface{}); okInstanceHttp2Options && len(valueInstanceHttp2OptionsCollection) > 0 {
-				if valueInstanceHttp2Options, okInstanceHttp2Options := valueInstanceHttp2OptionsCollection[0].(map[string]interface{}); okInstanceHttp2Options {
-					msg, err := UnmarshalServiceHttp2Options(valueInstanceHttp2Options)
-					if err != nil {
-						return nil, err
-					}
-					p["instance_http2_options"] = msg
-				}
-			}
+	if valueRequiredProvidersNames, okRequiredProvidersNames := obj["required_providers_names"].([]interface{}); okRequiredProvidersNames {
+		list := valueRequiredProvidersNames
+		r := []string{}
+		for _, val := range list {
+			r = append(r, val.(string))
 		}
+		p["required_providers_names"] = r
 	}
 	return p, nil
 }
 
-func UnmarshalServiceProto(obj map[string]interface{}, m proto.Message) error {
-	d, err := UnmarshalService(obj)
+func UnmarshalHttpFilterJwtAuthnRuleProto(obj map[string]interface{}, m proto.Message) error {
+	d, err := UnmarshalHttpFilterJwtAuthnRule(obj)
 	if err != nil {
 		return err
 	}
@@ -637,34 +301,20 @@ func UnmarshalServiceProto(obj map[string]interface{}, m proto.Message) error {
 	return nil
 }
 
-func MarshalService(obj map[string]interface{}) (map[string]interface{}, error) {
+func MarshalHttpFilterJwtAuthnRule(obj map[string]interface{}) (map[string]interface{}, error) {
 	p := map[string]interface{}{}
-	p["xds_cluster_name"], _ = obj["xds_cluster_name"].(string)
-	p["service_name"], _ = obj["service_name"].(string)
-	p["instance_application_protocol_options"] = []interface{}{}
-	if _, ok := obj["instance_http1_options"]; ok {
-		p["instance_application_protocol_options"] = append(p["instance_application_protocol_options"].([]interface{}), map[string]interface{}{})
-		if m, ok := obj["instance_http1_options"].(map[string]interface{}); ok {
-			d, err := MarshalServiceHttp1Options(m)
-			if err != nil {
-				return nil, err
-			}
-			p["instance_application_protocol_options"].([]interface{})[0].(map[string]interface{})["instance_http1_options"] = []interface{}{d}
-		}
-	} else if _, ok := obj["instance_http2_options"]; ok {
-		p["instance_application_protocol_options"] = append(p["instance_application_protocol_options"].([]interface{}), map[string]interface{}{})
-		if m, ok := obj["instance_http2_options"].(map[string]interface{}); ok {
-			d, err := MarshalServiceHttp2Options(m)
-			if err != nil {
-				return nil, err
-			}
-			p["instance_application_protocol_options"].([]interface{})[0].(map[string]interface{})["instance_http2_options"] = []interface{}{d}
+	p["match_prefix"], _ = obj["match_prefix"].(string)
+	if l, ok := obj["required_providers_names"].([]interface{}); ok {
+		p["required_providers_names"] = []interface{}{}
+		for _, i := range l {
+			d := i.(string)
+			p["required_providers_names"] = append(p["required_providers_names"].([]interface{}), d)
 		}
 	}
 	return p, nil
 }
 
-func MarshalServiceProto(m proto.Message) (map[string]interface{}, error) {
+func MarshalHttpFilterJwtAuthnRuleProto(m proto.Message) (map[string]interface{}, error) {
 	obj := map[string]interface{}{}
 	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
 	if err != nil {
@@ -674,74 +324,7 @@ func MarshalServiceProto(m proto.Message) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	return MarshalService(obj)
-}
-
-func NewAwsLambdaGrpcSchema() map[string]*schema.Schema {
-	return map[string]*schema.Schema{
-		"full_method_name": {
-			Type:     schema.TypeString,
-			Optional: true,
-		},
-		"function_name": {
-			Type:     schema.TypeString,
-			Optional: true,
-		},
-		"qualifier": {
-			Type:     schema.TypeString,
-			Optional: true,
-		},
-	}
-}
-
-func UnmarshalAwsLambdaGrpc(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	if valueFullMethodName, okFullMethodName := obj["full_method_name"].(string); okFullMethodName {
-		p["full_method_name"] = valueFullMethodName
-	}
-	if valueFunctionName, okFunctionName := obj["function_name"].(string); okFunctionName {
-		p["function_name"] = valueFunctionName
-	}
-	if valueQualifier, okQualifier := obj["qualifier"].(string); okQualifier {
-		p["qualifier"] = valueQualifier
-	}
-	return p, nil
-}
-
-func UnmarshalAwsLambdaGrpcProto(obj map[string]interface{}, m proto.Message) error {
-	d, err := UnmarshalAwsLambdaGrpc(obj)
-	if err != nil {
-		return err
-	}
-	b, err := json.Marshal(d)
-	if err != nil {
-		return err
-	}
-	if err := protojson.Unmarshal(b, m); err != nil {
-		return err
-	}
-	return nil
-}
-
-func MarshalAwsLambdaGrpc(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	p["full_method_name"], _ = obj["full_method_name"].(string)
-	p["function_name"], _ = obj["function_name"].(string)
-	p["qualifier"], _ = obj["qualifier"].(string)
-	return p, nil
-}
-
-func MarshalAwsLambdaGrpcProto(m proto.Message) (map[string]interface{}, error) {
-	obj := map[string]interface{}{}
-	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(b, &obj)
-	if err != nil {
-		return nil, err
-	}
-	return MarshalAwsLambdaGrpc(obj)
+	return MarshalHttpFilterJwtAuthnRule(obj)
 }
 
 func NewNetworkingNodeSchema() map[string]*schema.Schema {
@@ -753,41 +336,46 @@ func NewNetworkingNodeSchema() map[string]*schema.Schema {
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 					"http_ingress": {
-						Type:     schema.TypeList,
-						MaxItems: 1,
-						Optional: true,
+						Type:        schema.TypeList,
+						MaxItems:    1,
+						Optional:    true,
+						Description: "HttpIngress node.",
 						Elem: &schema.Resource{
 							Schema: NewHttpIngressSchema(),
 						},
 					},
 					"service": {
-						Type:     schema.TypeList,
-						MaxItems: 1,
-						Optional: true,
+						Type:        schema.TypeList,
+						MaxItems:    1,
+						Optional:    true,
+						Description: "Service node.",
 						Elem: &schema.Resource{
 							Schema: NewServiceSchema(),
 						},
 					},
 					"routing_policy": {
-						Type:     schema.TypeList,
-						MaxItems: 1,
-						Optional: true,
+						Type:        schema.TypeList,
+						MaxItems:    1,
+						Optional:    true,
+						Description: "RoutingPolicy node.",
 						Elem: &schema.Resource{
 							Schema: NewRoutingPolicySchema(),
 						},
 					},
 					"aws_lambda_grpc": {
-						Type:     schema.TypeList,
-						MaxItems: 1,
-						Optional: true,
+						Type:        schema.TypeList,
+						MaxItems:    1,
+						Optional:    true,
+						Description: "AwsLambdaGrpc node.",
 						Elem: &schema.Resource{
 							Schema: NewAwsLambdaGrpcSchema(),
 						},
 					},
 					"instance_set": {
-						Type:     schema.TypeList,
-						MaxItems: 1,
-						Optional: true,
+						Type:        schema.TypeList,
+						MaxItems:    1,
+						Optional:    true,
+						Description: "InstanceSet node.",
 						Elem: &schema.Resource{
 							Schema: NewInstanceSetSchema(),
 						},
@@ -937,18 +525,639 @@ func MarshalNetworkingNodeProto(m proto.Message) (map[string]interface{}, error)
 	return MarshalNetworkingNode(obj)
 }
 
+func NewHttpFilterCorsSchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{}
+}
+
+func UnmarshalHttpFilterCors(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	return p, nil
+}
+
+func UnmarshalHttpFilterCorsProto(obj map[string]interface{}, m proto.Message) error {
+	d, err := UnmarshalHttpFilterCors(obj)
+	if err != nil {
+		return err
+	}
+	b, err := json.Marshal(d)
+	if err != nil {
+		return err
+	}
+	if err := protojson.Unmarshal(b, m); err != nil {
+		return err
+	}
+	return nil
+}
+
+func MarshalHttpFilterCors(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	return p, nil
+}
+
+func MarshalHttpFilterCorsProto(m proto.Message) (map[string]interface{}, error) {
+	obj := map[string]interface{}{}
+	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(b, &obj)
+	if err != nil {
+		return nil, err
+	}
+	return MarshalHttpFilterCors(obj)
+}
+
+func NewHttpFilterGrpcWebSchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{}
+}
+
+func UnmarshalHttpFilterGrpcWeb(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	return p, nil
+}
+
+func UnmarshalHttpFilterGrpcWebProto(obj map[string]interface{}, m proto.Message) error {
+	d, err := UnmarshalHttpFilterGrpcWeb(obj)
+	if err != nil {
+		return err
+	}
+	b, err := json.Marshal(d)
+	if err != nil {
+		return err
+	}
+	if err := protojson.Unmarshal(b, m); err != nil {
+		return err
+	}
+	return nil
+}
+
+func MarshalHttpFilterGrpcWeb(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	return p, nil
+}
+
+func MarshalHttpFilterGrpcWebProto(m proto.Message) (map[string]interface{}, error) {
+	obj := map[string]interface{}{}
+	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(b, &obj)
+	if err != nil {
+		return nil, err
+	}
+	return MarshalHttpFilterGrpcWeb(obj)
+}
+
+func NewInstanceSetSchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		"instances": {
+			Type:        schema.TypeList,
+			Optional:    true,
+			Description: "Instances in this set.",
+			Elem: &schema.Resource{
+				Schema: NewInstanceSetInstanceSchema(),
+			},
+		},
+		"match_service_names": {
+			Type:        schema.TypeList,
+			Optional:    true,
+			Description: "Services names to match instan",
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
+		},
+	}
+}
+
+func UnmarshalInstanceSet(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	if valueInstances, okInstances := obj["instances"].([]interface{}); okInstances {
+		list := valueInstances
+		r := []map[string]interface{}{}
+		for _, val := range list {
+			m, err := UnmarshalInstanceSetInstance(val.(map[string]interface{}))
+			if err != nil {
+				return nil, err
+			}
+			r = append(r, m)
+		}
+		p["instances"] = r
+	}
+	if valueMatchServiceNames, okMatchServiceNames := obj["match_service_names"].([]interface{}); okMatchServiceNames {
+		list := valueMatchServiceNames
+		r := []string{}
+		for _, val := range list {
+			r = append(r, val.(string))
+		}
+		p["match_service_names"] = r
+	}
+	return p, nil
+}
+
+func UnmarshalInstanceSetProto(obj map[string]interface{}, m proto.Message) error {
+	d, err := UnmarshalInstanceSet(obj)
+	if err != nil {
+		return err
+	}
+	b, err := json.Marshal(d)
+	if err != nil {
+		return err
+	}
+	if err := protojson.Unmarshal(b, m); err != nil {
+		return err
+	}
+	return nil
+}
+
+func MarshalInstanceSet(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	if l, ok := obj["instances"].([]interface{}); ok {
+		p["instances"] = []interface{}{}
+		for _, i := range l {
+			d, err := MarshalInstanceSetInstance(i.(map[string]interface{}))
+			if err != nil {
+				return nil, err
+			}
+			p["instances"] = append(p["instances"].([]interface{}), d)
+		}
+	}
+	if l, ok := obj["match_service_names"].([]interface{}); ok {
+		p["match_service_names"] = []interface{}{}
+		for _, i := range l {
+			d := i.(string)
+			p["match_service_names"] = append(p["match_service_names"].([]interface{}), d)
+		}
+	}
+	return p, nil
+}
+
+func MarshalInstanceSetProto(m proto.Message) (map[string]interface{}, error) {
+	obj := map[string]interface{}{}
+	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(b, &obj)
+	if err != nil {
+		return nil, err
+	}
+	return MarshalInstanceSet(obj)
+}
+
+func NewInstanceSetInstanceSchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		"hostname": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "Unique identifier for this instance.",
+		},
+		"transport_protocol": {
+			Type:         schema.TypeString,
+			Optional:     true,
+			ValidateFunc: validation.StringInSlice([]string{"TRANSPORT_PROTOCOL_UNDEFINED", "TRANSPORT_PROTOCOL_TCP", "TRANSPORT_PROTOCOL_UDP"}, false),
+			Description:  "Transport protocol available in the instance port.",
+		},
+		"address": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "Instance address (IPv4 or DNS).",
+		},
+		"port": {
+			Type:        schema.TypeInt,
+			Optional:    true,
+			Description: "Port number where the service is available.",
+		},
+	}
+}
+
+func UnmarshalInstanceSetInstance(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	if valueHostname, okHostname := obj["hostname"].(string); okHostname {
+		p["hostname"] = valueHostname
+	}
+	if valueTransportProtocol, okTransportProtocol := obj["transport_protocol"].(string); okTransportProtocol {
+		p["transport_protocol"] = valueTransportProtocol
+	}
+	if valueAddress, okAddress := obj["address"].(string); okAddress {
+		p["address"] = valueAddress
+	}
+	if valuePort, okPort := obj["port"].(int32); okPort {
+		p["port"] = valuePort
+	}
+	return p, nil
+}
+
+func UnmarshalInstanceSetInstanceProto(obj map[string]interface{}, m proto.Message) error {
+	d, err := UnmarshalInstanceSetInstance(obj)
+	if err != nil {
+		return err
+	}
+	b, err := json.Marshal(d)
+	if err != nil {
+		return err
+	}
+	if err := protojson.Unmarshal(b, m); err != nil {
+		return err
+	}
+	return nil
+}
+
+func MarshalInstanceSetInstance(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	p["hostname"], _ = obj["hostname"].(string)
+	p["transport_protocol"], _ = obj["transport_protocol"].(string)
+	p["address"], _ = obj["address"].(string)
+	p["port"], _ = obj["port"].(int32)
+	return p, nil
+}
+
+func MarshalInstanceSetInstanceProto(m proto.Message) (map[string]interface{}, error) {
+	obj := map[string]interface{}{}
+	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(b, &obj)
+	if err != nil {
+		return nil, err
+	}
+	return MarshalInstanceSetInstance(obj)
+}
+
+func NewServiceHttp1OptionsSchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{}
+}
+
+func UnmarshalServiceHttp1Options(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	return p, nil
+}
+
+func UnmarshalServiceHttp1OptionsProto(obj map[string]interface{}, m proto.Message) error {
+	d, err := UnmarshalServiceHttp1Options(obj)
+	if err != nil {
+		return err
+	}
+	b, err := json.Marshal(d)
+	if err != nil {
+		return err
+	}
+	if err := protojson.Unmarshal(b, m); err != nil {
+		return err
+	}
+	return nil
+}
+
+func MarshalServiceHttp1Options(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	return p, nil
+}
+
+func MarshalServiceHttp1OptionsProto(m proto.Message) (map[string]interface{}, error) {
+	obj := map[string]interface{}{}
+	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(b, &obj)
+	if err != nil {
+		return nil, err
+	}
+	return MarshalServiceHttp1Options(obj)
+}
+
+func NewRoutingPolicySchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		"ingress_name": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "Ingress name to match this routing policy.",
+		},
+		"routes": {
+			Type:        schema.TypeList,
+			Optional:    true,
+			Description: "Routes in this routing policy.",
+			Elem: &schema.Resource{
+				Schema: NewRoutingPolicyRouteSchema(),
+			},
+		},
+		"cors": {
+			Type:        schema.TypeList,
+			MaxItems:    1,
+			Optional:    true,
+			Description: "Cors policy to apply in this routing policy.",
+			Elem: &schema.Resource{
+				Schema: NewRoutingPolicyCorsSchema(),
+			},
+		},
+		"xds_cluster_name": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "XDS cluster name: must be the same of the envoy config to be matched by  xDS server",
+		},
+		"domain": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "Domain to match (you can use wildcard domains).",
+		},
+	}
+}
+
+func UnmarshalRoutingPolicy(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	if valueIngressName, okIngressName := obj["ingress_name"].(string); okIngressName {
+		p["ingress_name"] = valueIngressName
+	}
+	if valueRoutes, okRoutes := obj["routes"].([]interface{}); okRoutes {
+		list := valueRoutes
+		r := []map[string]interface{}{}
+		for _, val := range list {
+			m, err := UnmarshalRoutingPolicyRoute(val.(map[string]interface{}))
+			if err != nil {
+				return nil, err
+			}
+			r = append(r, m)
+		}
+		p["routes"] = r
+	}
+	if valueCorsCollection, okCors := obj["cors"].([]interface{}); okCors && len(valueCorsCollection) > 0 {
+		if valueCors, okCors := valueCorsCollection[0].(map[string]interface{}); okCors {
+			msg, err := UnmarshalRoutingPolicyCors(valueCors)
+			if err != nil {
+				return nil, err
+			}
+			p["cors"] = msg
+		}
+	}
+	if valueXdsClusterName, okXdsClusterName := obj["xds_cluster_name"].(string); okXdsClusterName {
+		p["xds_cluster_name"] = valueXdsClusterName
+	}
+	if valueDomain, okDomain := obj["domain"].(string); okDomain {
+		p["domain"] = valueDomain
+	}
+	return p, nil
+}
+
+func UnmarshalRoutingPolicyProto(obj map[string]interface{}, m proto.Message) error {
+	d, err := UnmarshalRoutingPolicy(obj)
+	if err != nil {
+		return err
+	}
+	b, err := json.Marshal(d)
+	if err != nil {
+		return err
+	}
+	if err := protojson.Unmarshal(b, m); err != nil {
+		return err
+	}
+	return nil
+}
+
+func MarshalRoutingPolicy(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	p["ingress_name"], _ = obj["ingress_name"].(string)
+	if l, ok := obj["routes"].([]interface{}); ok {
+		p["routes"] = []interface{}{}
+		for _, i := range l {
+			d, err := MarshalRoutingPolicyRoute(i.(map[string]interface{}))
+			if err != nil {
+				return nil, err
+			}
+			p["routes"] = append(p["routes"].([]interface{}), d)
+		}
+	}
+	if m, ok := obj["cors"].(map[string]interface{}); ok {
+		d, err := MarshalRoutingPolicyCors(m)
+		if err != nil {
+			return nil, err
+		}
+		p["cors"] = []interface{}{d}
+	}
+	p["xds_cluster_name"], _ = obj["xds_cluster_name"].(string)
+	p["domain"], _ = obj["domain"].(string)
+	return p, nil
+}
+
+func MarshalRoutingPolicyProto(m proto.Message) (map[string]interface{}, error) {
+	obj := map[string]interface{}{}
+	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(b, &obj)
+	if err != nil {
+		return nil, err
+	}
+	return MarshalRoutingPolicy(obj)
+}
+
+func NewRoutingPolicyCorsSchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		"allow_origin_string_match_prefix": {
+			Type:        schema.TypeList,
+			Optional:    true,
+			Description: "Specifies string patterns that match allowed origins. An origin is allowed if any of the string matchers match.",
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
+		},
+		"allow_methods": {
+			Type:        schema.TypeList,
+			Optional:    true,
+			Description: "Specifies the content for the access-control-allow-methods header.",
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
+		},
+		"allow_headers": {
+			Type:        schema.TypeList,
+			Optional:    true,
+			Description: "Specifies the content for the access-control-allow-headers header.",
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
+		},
+		"expose_headers": {
+			Type:        schema.TypeList,
+			Optional:    true,
+			Description: "Specifies the content for the access-control-expose-headers header.",
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
+		},
+		"max_age": {
+			Type:        schema.TypeInt,
+			Optional:    true,
+			Description: "Specifies the content for the access-control-max-age header.",
+		},
+	}
+}
+
+func UnmarshalRoutingPolicyCors(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	if valueAllowOriginStringMatchPrefix, okAllowOriginStringMatchPrefix := obj["allow_origin_string_match_prefix"].([]interface{}); okAllowOriginStringMatchPrefix {
+		list := valueAllowOriginStringMatchPrefix
+		r := []string{}
+		for _, val := range list {
+			r = append(r, val.(string))
+		}
+		p["allow_origin_string_match_prefix"] = r
+	}
+	if valueAllowMethods, okAllowMethods := obj["allow_methods"].([]interface{}); okAllowMethods {
+		list := valueAllowMethods
+		r := []string{}
+		for _, val := range list {
+			r = append(r, val.(string))
+		}
+		p["allow_methods"] = r
+	}
+	if valueAllowHeaders, okAllowHeaders := obj["allow_headers"].([]interface{}); okAllowHeaders {
+		list := valueAllowHeaders
+		r := []string{}
+		for _, val := range list {
+			r = append(r, val.(string))
+		}
+		p["allow_headers"] = r
+	}
+	if valueExposeHeaders, okExposeHeaders := obj["expose_headers"].([]interface{}); okExposeHeaders {
+		list := valueExposeHeaders
+		r := []string{}
+		for _, val := range list {
+			r = append(r, val.(string))
+		}
+		p["expose_headers"] = r
+	}
+	return p, nil
+}
+
+func UnmarshalRoutingPolicyCorsProto(obj map[string]interface{}, m proto.Message) error {
+	d, err := UnmarshalRoutingPolicyCors(obj)
+	if err != nil {
+		return err
+	}
+	b, err := json.Marshal(d)
+	if err != nil {
+		return err
+	}
+	if err := protojson.Unmarshal(b, m); err != nil {
+		return err
+	}
+	return nil
+}
+
+func MarshalRoutingPolicyCors(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	if l, ok := obj["allow_origin_string_match_prefix"].([]interface{}); ok {
+		p["allow_origin_string_match_prefix"] = []interface{}{}
+		for _, i := range l {
+			d := i.(string)
+			p["allow_origin_string_match_prefix"] = append(p["allow_origin_string_match_prefix"].([]interface{}), d)
+		}
+	}
+	if l, ok := obj["allow_methods"].([]interface{}); ok {
+		p["allow_methods"] = []interface{}{}
+		for _, i := range l {
+			d := i.(string)
+			p["allow_methods"] = append(p["allow_methods"].([]interface{}), d)
+		}
+	}
+	if l, ok := obj["allow_headers"].([]interface{}); ok {
+		p["allow_headers"] = []interface{}{}
+		for _, i := range l {
+			d := i.(string)
+			p["allow_headers"] = append(p["allow_headers"].([]interface{}), d)
+		}
+	}
+	if l, ok := obj["expose_headers"].([]interface{}); ok {
+		p["expose_headers"] = []interface{}{}
+		for _, i := range l {
+			d := i.(string)
+			p["expose_headers"] = append(p["expose_headers"].([]interface{}), d)
+		}
+	}
+	return p, nil
+}
+
+func MarshalRoutingPolicyCorsProto(m proto.Message) (map[string]interface{}, error) {
+	obj := map[string]interface{}{}
+	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(b, &obj)
+	if err != nil {
+		return nil, err
+	}
+	return MarshalRoutingPolicyCors(obj)
+}
+
+func NewHttpFilterHealthCheckSchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		"path": {
+			Type:        schema.TypeString,
+			Required:    true,
+			Description: "Path is equivalent to check the 'path' header in the HTTP request.  Usually this is set to '/healthz'.",
+		},
+	}
+}
+
+func UnmarshalHttpFilterHealthCheck(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	if valuePath, okPath := obj["path"].(string); okPath {
+		p["path"] = valuePath
+	}
+	return p, nil
+}
+
+func UnmarshalHttpFilterHealthCheckProto(obj map[string]interface{}, m proto.Message) error {
+	d, err := UnmarshalHttpFilterHealthCheck(obj)
+	if err != nil {
+		return err
+	}
+	b, err := json.Marshal(d)
+	if err != nil {
+		return err
+	}
+	if err := protojson.Unmarshal(b, m); err != nil {
+		return err
+	}
+	return nil
+}
+
+func MarshalHttpFilterHealthCheck(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	p["path"], _ = obj["path"].(string)
+	return p, nil
+}
+
+func MarshalHttpFilterHealthCheckProto(m proto.Message) (map[string]interface{}, error) {
+	obj := map[string]interface{}{}
+	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(b, &obj)
+	if err != nil {
+		return nil, err
+	}
+	return MarshalHttpFilterHealthCheck(obj)
+}
+
 func NewHttpFilterJwtAuthnSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"providers": {
-			Type:     schema.TypeList,
-			Optional: true,
+			Type:        schema.TypeList,
+			Optional:    true,
+			Description: "List of providers.",
 			Elem: &schema.Resource{
 				Schema: NewHttpFilterJwtAuthnProviderSchema(),
 			},
 		},
 		"rules": {
-			Type:     schema.TypeList,
-			Optional: true,
+			Type:        schema.TypeList,
+			Optional:    true,
+			Description: "List of rules.",
 			Elem: &schema.Resource{
 				Schema: NewHttpFilterJwtAuthnRuleSchema(),
 			},
@@ -1041,42 +1250,49 @@ func MarshalHttpFilterJwtAuthnProto(m proto.Message) (map[string]interface{}, er
 func NewHttpFilterJwtAuthnProviderSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"provider_name": {
-			Type:     schema.TypeString,
-			Required: true,
+			Type:        schema.TypeString,
+			Required:    true,
+			Description: "Provider name to be used in the rules for matching requests.",
 		},
 		"forward": {
-			Type:     schema.TypeBool,
-			Required: true,
+			Type:        schema.TypeBool,
+			Required:    true,
+			Description: "Forward the JWT token to the upstream.",
 		},
 		"issuer": {
-			Type:     schema.TypeString,
-			Required: true,
+			Type:        schema.TypeString,
+			Required:    true,
+			Description: "Specify the principal that issued the JWT, usually a URL or an email address.  It is optional. If specified, it has to match the iss field in JWT, otherwise the JWT iss field is not checked.",
 		},
 		"audiences": {
-			Type:     schema.TypeList,
-			Optional: true,
+			Type:        schema.TypeList,
+			Optional:    true,
+			Description: "The list of JWT audiences are allowed to access.  A JWT containing any of these audiences will be accepted.  If not specified, will not check audiences in the token.",
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
 			},
 		},
 		"remote_jwks": {
-			Type:     schema.TypeList,
-			MaxItems: 1,
-			Optional: true,
+			Type:        schema.TypeList,
+			MaxItems:    1,
+			Optional:    true,
+			Description: "JWKS can be fetched from remote server via HTTP/HTTPS.  This field specifies the remote HTTP URI and how the fetched JWKS should be cached.",
 			Elem: &schema.Resource{
 				Schema: NewHttpFilterJwtAuthnRemoteJwksSchema(),
 			},
 		},
 		"claim_to_headers": {
-			Type:     schema.TypeList,
-			Optional: true,
+			Type:        schema.TypeList,
+			Optional:    true,
+			Description: "Add JWT claim to HTTP Header Specify the claim name you want to  copy in which HTTP header. For examples, following config:  The claim must be of type; string, int, double, bool.  Array type claims are not supported.",
 			Elem: &schema.Resource{
 				Schema: NewHttpFilterJwtAuthnClaimToHeaderSchema(),
 			},
 		},
 		"from_headers": {
-			Type:     schema.TypeList,
-			Optional: true,
+			Type:        schema.TypeList,
+			Optional:    true,
+			Description: "Define where to extract the JWT from an HTTP request.",
 			Elem: &schema.Resource{
 				Schema: NewHttpFilterJwtAuthnFromHeaderSchema(),
 			},
@@ -1209,62 +1425,42 @@ func MarshalHttpFilterJwtAuthnProviderProto(m proto.Message) (map[string]interfa
 	return MarshalHttpFilterJwtAuthnProvider(obj)
 }
 
-func NewInstanceSetInstanceSchema() map[string]*schema.Schema {
+func NewAwsLambdaGrpcSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
-		"hostname": {
+		"full_method_name": {
 			Type:        schema.TypeString,
 			Optional:    true,
-			Description: "Unique identifier for this instance",
+			Description: "Full method name of the gRPC method (/my.package.GrpcService/GrpcMethod).",
 		},
-		"transport_protocol": {
-			Type:         schema.TypeString,
-			Optional:     true,
-			ValidateFunc: validation.StringInSlice([]string{"TRANSPORT_PROTOCOL_UNDEFINED", "TRANSPORT_PROTOCOL_TCP", "TRANSPORT_PROTOCOL_UDP"}, false),
+		"function_name": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "Lambda function name or ARN.",
 		},
-		"address": {
-			Type:     schema.TypeString,
-			Optional: true,
-		},
-		"port": {
-			Type:     schema.TypeInt,
-			Optional: true,
-		},
-		"region": {
-			Type:     schema.TypeString,
-			Optional: true,
-		},
-		"zone": {
-			Type:     schema.TypeString,
-			Optional: true,
+		"qualifier": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "Version name of Lambda (default $LATEST).",
 		},
 	}
 }
 
-func UnmarshalInstanceSetInstance(obj map[string]interface{}) (map[string]interface{}, error) {
+func UnmarshalAwsLambdaGrpc(obj map[string]interface{}) (map[string]interface{}, error) {
 	p := map[string]interface{}{}
-	if valueHostname, okHostname := obj["hostname"].(string); okHostname {
-		p["hostname"] = valueHostname
+	if valueFullMethodName, okFullMethodName := obj["full_method_name"].(string); okFullMethodName {
+		p["full_method_name"] = valueFullMethodName
 	}
-	if valueTransportProtocol, okTransportProtocol := obj["transport_protocol"].(string); okTransportProtocol {
-		p["transport_protocol"] = valueTransportProtocol
+	if valueFunctionName, okFunctionName := obj["function_name"].(string); okFunctionName {
+		p["function_name"] = valueFunctionName
 	}
-	if valueAddress, okAddress := obj["address"].(string); okAddress {
-		p["address"] = valueAddress
-	}
-	if valuePort, okPort := obj["port"].(int32); okPort {
-		p["port"] = valuePort
-	}
-	if valueRegion, okRegion := obj["region"].(string); okRegion {
-		p["region"] = valueRegion
-	}
-	if valueZone, okZone := obj["zone"].(string); okZone {
-		p["zone"] = valueZone
+	if valueQualifier, okQualifier := obj["qualifier"].(string); okQualifier {
+		p["qualifier"] = valueQualifier
 	}
 	return p, nil
 }
 
-func UnmarshalInstanceSetInstanceProto(obj map[string]interface{}, m proto.Message) error {
-	d, err := UnmarshalInstanceSetInstance(obj)
+func UnmarshalAwsLambdaGrpcProto(obj map[string]interface{}, m proto.Message) error {
+	d, err := UnmarshalAwsLambdaGrpc(obj)
 	if err != nil {
 		return err
 	}
@@ -1278,18 +1474,15 @@ func UnmarshalInstanceSetInstanceProto(obj map[string]interface{}, m proto.Messa
 	return nil
 }
 
-func MarshalInstanceSetInstance(obj map[string]interface{}) (map[string]interface{}, error) {
+func MarshalAwsLambdaGrpc(obj map[string]interface{}) (map[string]interface{}, error) {
 	p := map[string]interface{}{}
-	p["hostname"], _ = obj["hostname"].(string)
-	p["transport_protocol"], _ = obj["transport_protocol"].(string)
-	p["address"], _ = obj["address"].(string)
-	p["port"], _ = obj["port"].(int32)
-	p["region"], _ = obj["region"].(string)
-	p["zone"], _ = obj["zone"].(string)
+	p["full_method_name"], _ = obj["full_method_name"].(string)
+	p["function_name"], _ = obj["function_name"].(string)
+	p["qualifier"], _ = obj["qualifier"].(string)
 	return p, nil
 }
 
-func MarshalInstanceSetInstanceProto(m proto.Message) (map[string]interface{}, error) {
+func MarshalAwsLambdaGrpcProto(m proto.Message) (map[string]interface{}, error) {
 	obj := map[string]interface{}{}
 	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
 	if err != nil {
@@ -1299,28 +1492,93 @@ func MarshalInstanceSetInstanceProto(m proto.Message) (map[string]interface{}, e
 	if err != nil {
 		return nil, err
 	}
-	return MarshalInstanceSetInstance(obj)
+	return MarshalAwsLambdaGrpc(obj)
 }
 
-func NewServiceHttp2OptionsSchema() map[string]*schema.Schema {
+func NewServiceSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
-		"max_concurrent_streams": {
-			Type:     schema.TypeInt,
+		"xds_cluster_name": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "XDS cluster name: must be the same of the envoy config to be matched by  xDS server.",
+		},
+		"service_name": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "Service name (or 'cluster' name in Envoy xDS).",
+		},
+		"connect_timeout": {
+			Type:        schema.TypeInt,
+			Optional:    true,
+			Description: "Timeout to connect to upstream.",
+		},
+		"instance_application_protocol_options": {
+			Type:     schema.TypeList,
+			MaxItems: 1,
 			Optional: true,
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"instance_http1_options": {
+						Type:        schema.TypeList,
+						MaxItems:    1,
+						Optional:    true,
+						Description: "Http1Options options.",
+						Elem: &schema.Resource{
+							Schema: NewServiceHttp1OptionsSchema(),
+						},
+					},
+					"instance_http2_options": {
+						Type:        schema.TypeList,
+						MaxItems:    1,
+						Optional:    true,
+						Description: "Http2Options options.",
+						Elem: &schema.Resource{
+							Schema: NewServiceHttp2OptionsSchema(),
+						},
+					},
+				},
+			},
 		},
 	}
 }
 
-func UnmarshalServiceHttp2Options(obj map[string]interface{}) (map[string]interface{}, error) {
+func UnmarshalService(obj map[string]interface{}) (map[string]interface{}, error) {
 	p := map[string]interface{}{}
-	if valueMaxConcurrentStreams, okMaxConcurrentStreams := obj["max_concurrent_streams"].(int32); okMaxConcurrentStreams {
-		p["max_concurrent_streams"] = valueMaxConcurrentStreams
+	if valueXdsClusterName, okXdsClusterName := obj["xds_cluster_name"].(string); okXdsClusterName {
+		p["xds_cluster_name"] = valueXdsClusterName
+	}
+	if valueServiceName, okServiceName := obj["service_name"].(string); okServiceName {
+		p["service_name"] = valueServiceName
+	}
+	if valueInstanceApplicationProtocolOptions, okInstanceApplicationProtocolOptions := obj["instance_application_protocol_options"].([]interface{}); okInstanceApplicationProtocolOptions && len(valueInstanceApplicationProtocolOptions) > 0 {
+		o := valueInstanceApplicationProtocolOptions[0].(map[string]interface{})
+		if oneOfVal, ok := o["instance_http1_options"]; ok {
+			if valueInstanceHttp1OptionsCollection, okInstanceHttp1Options := oneOfVal.([]interface{}); okInstanceHttp1Options && len(valueInstanceHttp1OptionsCollection) > 0 {
+				if valueInstanceHttp1Options, okInstanceHttp1Options := valueInstanceHttp1OptionsCollection[0].(map[string]interface{}); okInstanceHttp1Options {
+					msg, err := UnmarshalServiceHttp1Options(valueInstanceHttp1Options)
+					if err != nil {
+						return nil, err
+					}
+					p["instance_http1_options"] = msg
+				}
+			}
+		} else if oneOfVal, ok := o["instance_http2_options"]; ok {
+			if valueInstanceHttp2OptionsCollection, okInstanceHttp2Options := oneOfVal.([]interface{}); okInstanceHttp2Options && len(valueInstanceHttp2OptionsCollection) > 0 {
+				if valueInstanceHttp2Options, okInstanceHttp2Options := valueInstanceHttp2OptionsCollection[0].(map[string]interface{}); okInstanceHttp2Options {
+					msg, err := UnmarshalServiceHttp2Options(valueInstanceHttp2Options)
+					if err != nil {
+						return nil, err
+					}
+					p["instance_http2_options"] = msg
+				}
+			}
+		}
 	}
 	return p, nil
 }
 
-func UnmarshalServiceHttp2OptionsProto(obj map[string]interface{}, m proto.Message) error {
-	d, err := UnmarshalServiceHttp2Options(obj)
+func UnmarshalServiceProto(obj map[string]interface{}, m proto.Message) error {
+	d, err := UnmarshalService(obj)
 	if err != nil {
 		return err
 	}
@@ -1334,13 +1592,34 @@ func UnmarshalServiceHttp2OptionsProto(obj map[string]interface{}, m proto.Messa
 	return nil
 }
 
-func MarshalServiceHttp2Options(obj map[string]interface{}) (map[string]interface{}, error) {
+func MarshalService(obj map[string]interface{}) (map[string]interface{}, error) {
 	p := map[string]interface{}{}
-	p["max_concurrent_streams"], _ = obj["max_concurrent_streams"].(int32)
+	p["xds_cluster_name"], _ = obj["xds_cluster_name"].(string)
+	p["service_name"], _ = obj["service_name"].(string)
+	p["instance_application_protocol_options"] = []interface{}{}
+	if _, ok := obj["instance_http1_options"]; ok {
+		p["instance_application_protocol_options"] = append(p["instance_application_protocol_options"].([]interface{}), map[string]interface{}{})
+		if m, ok := obj["instance_http1_options"].(map[string]interface{}); ok {
+			d, err := MarshalServiceHttp1Options(m)
+			if err != nil {
+				return nil, err
+			}
+			p["instance_application_protocol_options"].([]interface{})[0].(map[string]interface{})["instance_http1_options"] = []interface{}{d}
+		}
+	} else if _, ok := obj["instance_http2_options"]; ok {
+		p["instance_application_protocol_options"] = append(p["instance_application_protocol_options"].([]interface{}), map[string]interface{}{})
+		if m, ok := obj["instance_http2_options"].(map[string]interface{}); ok {
+			d, err := MarshalServiceHttp2Options(m)
+			if err != nil {
+				return nil, err
+			}
+			p["instance_application_protocol_options"].([]interface{})[0].(map[string]interface{})["instance_http2_options"] = []interface{}{d}
+		}
+	}
 	return p, nil
 }
 
-func MarshalServiceHttp2OptionsProto(m proto.Message) (map[string]interface{}, error) {
+func MarshalServiceProto(m proto.Message) (map[string]interface{}, error) {
 	obj := map[string]interface{}{}
 	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
 	if err != nil {
@@ -1350,39 +1629,110 @@ func MarshalServiceHttp2OptionsProto(m proto.Message) (map[string]interface{}, e
 	if err != nil {
 		return nil, err
 	}
-	return MarshalServiceHttp2Options(obj)
+	return MarshalService(obj)
 }
 
-func NewRoutingPolicyRouteSchema() map[string]*schema.Schema {
+func NewHttpFilterSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
-		"match_prefix": {
-			Type:     schema.TypeString,
+		"filter": {
+			Type:     schema.TypeList,
+			MaxItems: 1,
 			Optional: true,
-		},
-		"target_service": {
-			Type:     schema.TypeString,
-			Optional: true,
-		},
-		"timeout": {
-			Type:     schema.TypeInt,
-			Optional: true,
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"cors": {
+						Type:        schema.TypeList,
+						MaxItems:    1,
+						Optional:    true,
+						Description: "Cors filter.",
+						Elem: &schema.Resource{
+							Schema: NewHttpFilterCorsSchema(),
+						},
+					},
+					"health_check": {
+						Type:        schema.TypeList,
+						MaxItems:    1,
+						Optional:    true,
+						Description: "Health check filter.",
+						Elem: &schema.Resource{
+							Schema: NewHttpFilterHealthCheckSchema(),
+						},
+					},
+					"grpc_web": {
+						Type:        schema.TypeList,
+						MaxItems:    1,
+						Optional:    true,
+						Description: "grpc-web filter.",
+						Elem: &schema.Resource{
+							Schema: NewHttpFilterGrpcWebSchema(),
+						},
+					},
+					"jwt_authn": {
+						Type:        schema.TypeList,
+						MaxItems:    1,
+						Optional:    true,
+						Description: "JWT Authentication filter.",
+						Elem: &schema.Resource{
+							Schema: NewHttpFilterJwtAuthnSchema(),
+						},
+					},
+				},
+			},
 		},
 	}
 }
 
-func UnmarshalRoutingPolicyRoute(obj map[string]interface{}) (map[string]interface{}, error) {
+func UnmarshalHttpFilter(obj map[string]interface{}) (map[string]interface{}, error) {
 	p := map[string]interface{}{}
-	if valueMatchPrefix, okMatchPrefix := obj["match_prefix"].(string); okMatchPrefix {
-		p["match_prefix"] = valueMatchPrefix
-	}
-	if valueTargetService, okTargetService := obj["target_service"].(string); okTargetService {
-		p["target_service"] = valueTargetService
+	if valueFilter, okFilter := obj["filter"].([]interface{}); okFilter && len(valueFilter) > 0 {
+		o := valueFilter[0].(map[string]interface{})
+		if oneOfVal, ok := o["cors"]; ok {
+			if valueCorsCollection, okCors := oneOfVal.([]interface{}); okCors && len(valueCorsCollection) > 0 {
+				if valueCors, okCors := valueCorsCollection[0].(map[string]interface{}); okCors {
+					msg, err := UnmarshalHttpFilterCors(valueCors)
+					if err != nil {
+						return nil, err
+					}
+					p["cors"] = msg
+				}
+			}
+		} else if oneOfVal, ok := o["health_check"]; ok {
+			if valueHealthCheckCollection, okHealthCheck := oneOfVal.([]interface{}); okHealthCheck && len(valueHealthCheckCollection) > 0 {
+				if valueHealthCheck, okHealthCheck := valueHealthCheckCollection[0].(map[string]interface{}); okHealthCheck {
+					msg, err := UnmarshalHttpFilterHealthCheck(valueHealthCheck)
+					if err != nil {
+						return nil, err
+					}
+					p["health_check"] = msg
+				}
+			}
+		} else if oneOfVal, ok := o["grpc_web"]; ok {
+			if valueGrpcWebCollection, okGrpcWeb := oneOfVal.([]interface{}); okGrpcWeb && len(valueGrpcWebCollection) > 0 {
+				if valueGrpcWeb, okGrpcWeb := valueGrpcWebCollection[0].(map[string]interface{}); okGrpcWeb {
+					msg, err := UnmarshalHttpFilterGrpcWeb(valueGrpcWeb)
+					if err != nil {
+						return nil, err
+					}
+					p["grpc_web"] = msg
+				}
+			}
+		} else if oneOfVal, ok := o["jwt_authn"]; ok {
+			if valueJwtAuthnCollection, okJwtAuthn := oneOfVal.([]interface{}); okJwtAuthn && len(valueJwtAuthnCollection) > 0 {
+				if valueJwtAuthn, okJwtAuthn := valueJwtAuthnCollection[0].(map[string]interface{}); okJwtAuthn {
+					msg, err := UnmarshalHttpFilterJwtAuthn(valueJwtAuthn)
+					if err != nil {
+						return nil, err
+					}
+					p["jwt_authn"] = msg
+				}
+			}
+		}
 	}
 	return p, nil
 }
 
-func UnmarshalRoutingPolicyRouteProto(obj map[string]interface{}, m proto.Message) error {
-	d, err := UnmarshalRoutingPolicyRoute(obj)
+func UnmarshalHttpFilterProto(obj map[string]interface{}, m proto.Message) error {
+	d, err := UnmarshalHttpFilter(obj)
 	if err != nil {
 		return err
 	}
@@ -1396,14 +1746,50 @@ func UnmarshalRoutingPolicyRouteProto(obj map[string]interface{}, m proto.Messag
 	return nil
 }
 
-func MarshalRoutingPolicyRoute(obj map[string]interface{}) (map[string]interface{}, error) {
+func MarshalHttpFilter(obj map[string]interface{}) (map[string]interface{}, error) {
 	p := map[string]interface{}{}
-	p["match_prefix"], _ = obj["match_prefix"].(string)
-	p["target_service"], _ = obj["target_service"].(string)
+	p["filter"] = []interface{}{}
+	if _, ok := obj["cors"]; ok {
+		p["filter"] = append(p["filter"].([]interface{}), map[string]interface{}{})
+		if m, ok := obj["cors"].(map[string]interface{}); ok {
+			d, err := MarshalHttpFilterCors(m)
+			if err != nil {
+				return nil, err
+			}
+			p["filter"].([]interface{})[0].(map[string]interface{})["cors"] = []interface{}{d}
+		}
+	} else if _, ok := obj["health_check"]; ok {
+		p["filter"] = append(p["filter"].([]interface{}), map[string]interface{}{})
+		if m, ok := obj["health_check"].(map[string]interface{}); ok {
+			d, err := MarshalHttpFilterHealthCheck(m)
+			if err != nil {
+				return nil, err
+			}
+			p["filter"].([]interface{})[0].(map[string]interface{})["health_check"] = []interface{}{d}
+		}
+	} else if _, ok := obj["grpc_web"]; ok {
+		p["filter"] = append(p["filter"].([]interface{}), map[string]interface{}{})
+		if m, ok := obj["grpc_web"].(map[string]interface{}); ok {
+			d, err := MarshalHttpFilterGrpcWeb(m)
+			if err != nil {
+				return nil, err
+			}
+			p["filter"].([]interface{})[0].(map[string]interface{})["grpc_web"] = []interface{}{d}
+		}
+	} else if _, ok := obj["jwt_authn"]; ok {
+		p["filter"] = append(p["filter"].([]interface{}), map[string]interface{}{})
+		if m, ok := obj["jwt_authn"].(map[string]interface{}); ok {
+			d, err := MarshalHttpFilterJwtAuthn(m)
+			if err != nil {
+				return nil, err
+			}
+			p["filter"].([]interface{})[0].(map[string]interface{})["jwt_authn"] = []interface{}{d}
+		}
+	}
 	return p, nil
 }
 
-func MarshalRoutingPolicyRouteProto(m proto.Message) (map[string]interface{}, error) {
+func MarshalHttpFilterProto(m proto.Message) (map[string]interface{}, error) {
 	obj := map[string]interface{}{}
 	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
 	if err != nil {
@@ -1413,85 +1799,37 @@ func MarshalRoutingPolicyRouteProto(m proto.Message) (map[string]interface{}, er
 	if err != nil {
 		return nil, err
 	}
-	return MarshalRoutingPolicyRoute(obj)
+	return MarshalHttpFilter(obj)
 }
 
-func NewRoutingPolicyCorsSchema() map[string]*schema.Schema {
+func NewHttpFilterJwtAuthnFromHeaderSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
-		"allow_origin_string_match_prefix": {
-			Type:     schema.TypeList,
-			Optional: true,
-			Elem: &schema.Schema{
-				Type: schema.TypeString,
-			},
+		"header_name": {
+			Type:        schema.TypeString,
+			Required:    true,
+			Description: "This is the header name to get the JWT. Example: 'Authorization'",
 		},
-		"allow_methods": {
-			Type:     schema.TypeList,
-			Optional: true,
-			Elem: &schema.Schema{
-				Type: schema.TypeString,
-			},
-		},
-		"allow_headers": {
-			Type:     schema.TypeList,
-			Optional: true,
-			Elem: &schema.Schema{
-				Type: schema.TypeString,
-			},
-		},
-		"expose_headers": {
-			Type:     schema.TypeList,
-			Optional: true,
-			Elem: &schema.Schema{
-				Type: schema.TypeString,
-			},
-		},
-		"max_age": {
-			Type:     schema.TypeInt,
-			Optional: true,
+		"value_prefix": {
+			Type:        schema.TypeString,
+			Required:    true,
+			Description: "ValuePrefix specifies a prefix in the value before the JWT token to be removed.  Example: 'Bearer '",
 		},
 	}
 }
 
-func UnmarshalRoutingPolicyCors(obj map[string]interface{}) (map[string]interface{}, error) {
+func UnmarshalHttpFilterJwtAuthnFromHeader(obj map[string]interface{}) (map[string]interface{}, error) {
 	p := map[string]interface{}{}
-	if valueAllowOriginStringMatchPrefix, okAllowOriginStringMatchPrefix := obj["allow_origin_string_match_prefix"].([]interface{}); okAllowOriginStringMatchPrefix {
-		list := valueAllowOriginStringMatchPrefix
-		r := []string{}
-		for _, val := range list {
-			r = append(r, val.(string))
-		}
-		p["allow_origin_string_match_prefix"] = r
+	if valueHeaderName, okHeaderName := obj["header_name"].(string); okHeaderName {
+		p["header_name"] = valueHeaderName
 	}
-	if valueAllowMethods, okAllowMethods := obj["allow_methods"].([]interface{}); okAllowMethods {
-		list := valueAllowMethods
-		r := []string{}
-		for _, val := range list {
-			r = append(r, val.(string))
-		}
-		p["allow_methods"] = r
-	}
-	if valueAllowHeaders, okAllowHeaders := obj["allow_headers"].([]interface{}); okAllowHeaders {
-		list := valueAllowHeaders
-		r := []string{}
-		for _, val := range list {
-			r = append(r, val.(string))
-		}
-		p["allow_headers"] = r
-	}
-	if valueExposeHeaders, okExposeHeaders := obj["expose_headers"].([]interface{}); okExposeHeaders {
-		list := valueExposeHeaders
-		r := []string{}
-		for _, val := range list {
-			r = append(r, val.(string))
-		}
-		p["expose_headers"] = r
+	if valueValuePrefix, okValuePrefix := obj["value_prefix"].(string); okValuePrefix {
+		p["value_prefix"] = valueValuePrefix
 	}
 	return p, nil
 }
 
-func UnmarshalRoutingPolicyCorsProto(obj map[string]interface{}, m proto.Message) error {
-	d, err := UnmarshalRoutingPolicyCors(obj)
+func UnmarshalHttpFilterJwtAuthnFromHeaderProto(obj map[string]interface{}, m proto.Message) error {
+	d, err := UnmarshalHttpFilterJwtAuthnFromHeader(obj)
 	if err != nil {
 		return err
 	}
@@ -1505,40 +1843,14 @@ func UnmarshalRoutingPolicyCorsProto(obj map[string]interface{}, m proto.Message
 	return nil
 }
 
-func MarshalRoutingPolicyCors(obj map[string]interface{}) (map[string]interface{}, error) {
+func MarshalHttpFilterJwtAuthnFromHeader(obj map[string]interface{}) (map[string]interface{}, error) {
 	p := map[string]interface{}{}
-	if l, ok := obj["allow_origin_string_match_prefix"].([]interface{}); ok {
-		p["allow_origin_string_match_prefix"] = []interface{}{}
-		for _, i := range l {
-			d := i.(string)
-			p["allow_origin_string_match_prefix"] = append(p["allow_origin_string_match_prefix"].([]interface{}), d)
-		}
-	}
-	if l, ok := obj["allow_methods"].([]interface{}); ok {
-		p["allow_methods"] = []interface{}{}
-		for _, i := range l {
-			d := i.(string)
-			p["allow_methods"] = append(p["allow_methods"].([]interface{}), d)
-		}
-	}
-	if l, ok := obj["allow_headers"].([]interface{}); ok {
-		p["allow_headers"] = []interface{}{}
-		for _, i := range l {
-			d := i.(string)
-			p["allow_headers"] = append(p["allow_headers"].([]interface{}), d)
-		}
-	}
-	if l, ok := obj["expose_headers"].([]interface{}); ok {
-		p["expose_headers"] = []interface{}{}
-		for _, i := range l {
-			d := i.(string)
-			p["expose_headers"] = append(p["expose_headers"].([]interface{}), d)
-		}
-	}
+	p["header_name"], _ = obj["header_name"].(string)
+	p["value_prefix"], _ = obj["value_prefix"].(string)
 	return p, nil
 }
 
-func MarshalRoutingPolicyCorsProto(m proto.Message) (map[string]interface{}, error) {
+func MarshalHttpFilterJwtAuthnFromHeaderProto(m proto.Message) (map[string]interface{}, error) {
 	obj := map[string]interface{}{}
 	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
 	if err != nil {
@@ -1548,164 +1860,7 @@ func MarshalRoutingPolicyCorsProto(m proto.Message) (map[string]interface{}, err
 	if err != nil {
 		return nil, err
 	}
-	return MarshalRoutingPolicyCors(obj)
-}
-
-func NewHttpFilterCorsSchema() map[string]*schema.Schema {
-	return map[string]*schema.Schema{}
-}
-
-func UnmarshalHttpFilterCors(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	return p, nil
-}
-
-func UnmarshalHttpFilterCorsProto(obj map[string]interface{}, m proto.Message) error {
-	d, err := UnmarshalHttpFilterCors(obj)
-	if err != nil {
-		return err
-	}
-	b, err := json.Marshal(d)
-	if err != nil {
-		return err
-	}
-	if err := protojson.Unmarshal(b, m); err != nil {
-		return err
-	}
-	return nil
-}
-
-func MarshalHttpFilterCors(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	return p, nil
-}
-
-func MarshalHttpFilterCorsProto(m proto.Message) (map[string]interface{}, error) {
-	obj := map[string]interface{}{}
-	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(b, &obj)
-	if err != nil {
-		return nil, err
-	}
-	return MarshalHttpFilterCors(obj)
-}
-
-func NewHttpFilterGrpcWebSchema() map[string]*schema.Schema {
-	return map[string]*schema.Schema{}
-}
-
-func UnmarshalHttpFilterGrpcWeb(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	return p, nil
-}
-
-func UnmarshalHttpFilterGrpcWebProto(obj map[string]interface{}, m proto.Message) error {
-	d, err := UnmarshalHttpFilterGrpcWeb(obj)
-	if err != nil {
-		return err
-	}
-	b, err := json.Marshal(d)
-	if err != nil {
-		return err
-	}
-	if err := protojson.Unmarshal(b, m); err != nil {
-		return err
-	}
-	return nil
-}
-
-func MarshalHttpFilterGrpcWeb(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	return p, nil
-}
-
-func MarshalHttpFilterGrpcWebProto(m proto.Message) (map[string]interface{}, error) {
-	obj := map[string]interface{}{}
-	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(b, &obj)
-	if err != nil {
-		return nil, err
-	}
-	return MarshalHttpFilterGrpcWeb(obj)
-}
-
-func NewHttpFilterJwtAuthnRuleSchema() map[string]*schema.Schema {
-	return map[string]*schema.Schema{
-		"match_prefix": {
-			Type:     schema.TypeString,
-			Optional: true,
-		},
-		"required_providers_names": {
-			Type:     schema.TypeList,
-			Optional: true,
-			Elem: &schema.Schema{
-				Type: schema.TypeString,
-			},
-		},
-	}
-}
-
-func UnmarshalHttpFilterJwtAuthnRule(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	if valueMatchPrefix, okMatchPrefix := obj["match_prefix"].(string); okMatchPrefix {
-		p["match_prefix"] = valueMatchPrefix
-	}
-	if valueRequiredProvidersNames, okRequiredProvidersNames := obj["required_providers_names"].([]interface{}); okRequiredProvidersNames {
-		list := valueRequiredProvidersNames
-		r := []string{}
-		for _, val := range list {
-			r = append(r, val.(string))
-		}
-		p["required_providers_names"] = r
-	}
-	return p, nil
-}
-
-func UnmarshalHttpFilterJwtAuthnRuleProto(obj map[string]interface{}, m proto.Message) error {
-	d, err := UnmarshalHttpFilterJwtAuthnRule(obj)
-	if err != nil {
-		return err
-	}
-	b, err := json.Marshal(d)
-	if err != nil {
-		return err
-	}
-	if err := protojson.Unmarshal(b, m); err != nil {
-		return err
-	}
-	return nil
-}
-
-func MarshalHttpFilterJwtAuthnRule(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	p["match_prefix"], _ = obj["match_prefix"].(string)
-	if l, ok := obj["required_providers_names"].([]interface{}); ok {
-		p["required_providers_names"] = []interface{}{}
-		for _, i := range l {
-			d := i.(string)
-			p["required_providers_names"] = append(p["required_providers_names"].([]interface{}), d)
-		}
-	}
-	return p, nil
-}
-
-func MarshalHttpFilterJwtAuthnRuleProto(m proto.Message) (map[string]interface{}, error) {
-	obj := map[string]interface{}{}
-	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(b, &obj)
-	if err != nil {
-		return nil, err
-	}
-	return MarshalHttpFilterJwtAuthnRule(obj)
+	return MarshalHttpFilterJwtAuthnFromHeader(obj)
 }
 
 func NewHttpIngressSchema() map[string]*schema.Schema {
@@ -1713,22 +1868,22 @@ func NewHttpIngressSchema() map[string]*schema.Schema {
 		"xds_cluster_name": {
 			Type:        schema.TypeString,
 			Optional:    true,
-			Description: "XDS cluster name: must be the same of the envoy config to be matched by  xDS server",
+			Description: "XDS cluster name: must be the same of the envoy config to be matched by  xDS server.",
 		},
 		"ingress_name": {
 			Type:        schema.TypeString,
 			Optional:    true,
-			Description: "Ingress name (used as route config name for the route specifier)",
+			Description: "Ingress name (used as route config name for the route specifier).",
 		},
 		"listen_port": {
 			Type:        schema.TypeInt,
 			Optional:    true,
-			Description: "Ingress port to listen for incoming requests",
+			Description: "Ingress port to listen for incoming requests.",
 		},
 		"http_filters": {
 			Type:        schema.TypeList,
 			Optional:    true,
-			Description: "Http filters to apply to the ingress listener",
+			Description: "Http filters to apply to the ingress listener.",
 			Elem: &schema.Resource{
 				Schema: NewHttpFilterSchema(),
 			},
@@ -1806,125 +1961,4 @@ func MarshalHttpIngressProto(m proto.Message) (map[string]interface{}, error) {
 		return nil, err
 	}
 	return MarshalHttpIngress(obj)
-}
-
-func NewRoutingPolicySchema() map[string]*schema.Schema {
-	return map[string]*schema.Schema{
-		"ingress_name": {
-			Type:     schema.TypeString,
-			Optional: true,
-		},
-		"routes": {
-			Type:     schema.TypeList,
-			Optional: true,
-			Elem: &schema.Resource{
-				Schema: NewRoutingPolicyRouteSchema(),
-			},
-		},
-		"cors": {
-			Type:     schema.TypeList,
-			MaxItems: 1,
-			Optional: true,
-			Elem: &schema.Resource{
-				Schema: NewRoutingPolicyCorsSchema(),
-			},
-		},
-		"xds_cluster_name": {
-			Type:        schema.TypeString,
-			Optional:    true,
-			Description: "XDS cluster name: must be the same of the envoy config to be matched by  xDS server",
-		},
-		"domain": {
-			Type:     schema.TypeString,
-			Optional: true,
-		},
-	}
-}
-
-func UnmarshalRoutingPolicy(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	if valueIngressName, okIngressName := obj["ingress_name"].(string); okIngressName {
-		p["ingress_name"] = valueIngressName
-	}
-	if valueRoutes, okRoutes := obj["routes"].([]interface{}); okRoutes {
-		list := valueRoutes
-		r := []map[string]interface{}{}
-		for _, val := range list {
-			m, err := UnmarshalRoutingPolicyRoute(val.(map[string]interface{}))
-			if err != nil {
-				return nil, err
-			}
-			r = append(r, m)
-		}
-		p["routes"] = r
-	}
-	if valueCorsCollection, okCors := obj["cors"].([]interface{}); okCors && len(valueCorsCollection) > 0 {
-		if valueCors, okCors := valueCorsCollection[0].(map[string]interface{}); okCors {
-			msg, err := UnmarshalRoutingPolicyCors(valueCors)
-			if err != nil {
-				return nil, err
-			}
-			p["cors"] = msg
-		}
-	}
-	if valueXdsClusterName, okXdsClusterName := obj["xds_cluster_name"].(string); okXdsClusterName {
-		p["xds_cluster_name"] = valueXdsClusterName
-	}
-	if valueDomain, okDomain := obj["domain"].(string); okDomain {
-		p["domain"] = valueDomain
-	}
-	return p, nil
-}
-
-func UnmarshalRoutingPolicyProto(obj map[string]interface{}, m proto.Message) error {
-	d, err := UnmarshalRoutingPolicy(obj)
-	if err != nil {
-		return err
-	}
-	b, err := json.Marshal(d)
-	if err != nil {
-		return err
-	}
-	if err := protojson.Unmarshal(b, m); err != nil {
-		return err
-	}
-	return nil
-}
-
-func MarshalRoutingPolicy(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	p["ingress_name"], _ = obj["ingress_name"].(string)
-	if l, ok := obj["routes"].([]interface{}); ok {
-		p["routes"] = []interface{}{}
-		for _, i := range l {
-			d, err := MarshalRoutingPolicyRoute(i.(map[string]interface{}))
-			if err != nil {
-				return nil, err
-			}
-			p["routes"] = append(p["routes"].([]interface{}), d)
-		}
-	}
-	if m, ok := obj["cors"].(map[string]interface{}); ok {
-		d, err := MarshalRoutingPolicyCors(m)
-		if err != nil {
-			return nil, err
-		}
-		p["cors"] = []interface{}{d}
-	}
-	p["xds_cluster_name"], _ = obj["xds_cluster_name"].(string)
-	p["domain"], _ = obj["domain"].(string)
-	return p, nil
-}
-
-func MarshalRoutingPolicyProto(m proto.Message) (map[string]interface{}, error) {
-	obj := map[string]interface{}{}
-	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(b, &obj)
-	if err != nil {
-		return nil, err
-	}
-	return MarshalRoutingPolicy(obj)
 }

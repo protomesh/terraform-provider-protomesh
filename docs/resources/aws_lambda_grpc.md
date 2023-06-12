@@ -3,12 +3,12 @@
 page_title: "protomesh_aws_lambda_grpc Resource - protomesh"
 subcategory: ""
 description: |-
-  Expose a AWS Lambda through a gRPC interface
+  Expose a AWS Lambda through a gRPC interface. It uses the Protomesh Gateway to expose the gRPC method.
 ---
 
 # protomesh_aws_lambda_grpc (Resource)
 
-Expose a AWS Lambda through a gRPC interface
+Expose a AWS Lambda through a gRPC interface. It uses the Protomesh Gateway to expose the gRPC method.
 
 
 
@@ -33,8 +33,8 @@ Expose a AWS Lambda through a gRPC interface
 
 Optional:
 
-- `full_method_name` (String)
-- `function_name` (String)
-- `qualifier` (String)
+- `full_method_name` (String) Full method name of the gRPC method (/my.package.GrpcService/GrpcMethod).
+- `function_name` (String) Lambda function name or ARN.
+- `qualifier` (String) Version name of Lambda (default $LATEST).
 
 

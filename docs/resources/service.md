@@ -3,12 +3,12 @@
 page_title: "protomesh_service Resource - protomesh"
 subcategory: ""
 description: |-
-  Expose a AWS Lambda through a gRPC interface
+  Service defines an upstream cluster to receive routed requests from HTTP Ingress.
 ---
 
 # protomesh_service (Resource)
 
-Expose a AWS Lambda through a gRPC interface
+Service defines an upstream cluster to receive routed requests from HTTP Ingress.
 
 
 
@@ -33,18 +33,18 @@ Expose a AWS Lambda through a gRPC interface
 
 Optional:
 
-- `connect_timeout` (Number)
+- `connect_timeout` (Number) Timeout to connect to upstream.
 - `instance_application_protocol_options` (Block List, Max: 1) (see [below for nested schema](#nestedblock--node--instance_application_protocol_options))
-- `service_name` (String)
-- `xds_cluster_name` (String) XDS cluster name: must be the same of the envoy config to be matched by  xDS server
+- `service_name` (String) Service name (or 'cluster' name in Envoy xDS).
+- `xds_cluster_name` (String) XDS cluster name: must be the same of the envoy config to be matched by  xDS server.
 
 <a id="nestedblock--node--instance_application_protocol_options"></a>
 ### Nested Schema for `node.instance_application_protocol_options`
 
 Optional:
 
-- `instance_http1_options` (Block List, Max: 1) (see [below for nested schema](#nestedblock--node--instance_application_protocol_options--instance_http1_options))
-- `instance_http2_options` (Block List, Max: 1) (see [below for nested schema](#nestedblock--node--instance_application_protocol_options--instance_http2_options))
+- `instance_http1_options` (Block List, Max: 1) Http1Options options. (see [below for nested schema](#nestedblock--node--instance_application_protocol_options--instance_http1_options))
+- `instance_http2_options` (Block List, Max: 1) Http2Options options. (see [below for nested schema](#nestedblock--node--instance_application_protocol_options--instance_http2_options))
 
 <a id="nestedblock--node--instance_application_protocol_options--instance_http1_options"></a>
 ### Nested Schema for `node.instance_application_protocol_options.instance_http1_options`
@@ -55,6 +55,6 @@ Optional:
 
 Optional:
 
-- `max_concurrent_streams` (Number)
+- `max_concurrent_streams` (Number) Maximum concurrent streams allowed for peer on one HTTP/2 connection.  Valid values range from 1 to 2147483647 (2^31 - 1) and defaults to 2147483647.
 
 

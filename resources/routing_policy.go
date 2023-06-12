@@ -16,7 +16,7 @@ func DataSourceRoutingPolicy() *schema.Resource {
 
 func ResourceRoutingPolicy() *schema.Resource {
 	return &schema.Resource{
-		Description:   "Expose a AWS Lambda through a gRPC interface",
+		Description:   "Defines how the HTTP Ingress routes requests to services.",
 		CreateContext: createRoutingPolicy,
 		ReadContext:   readRoutingPolicy,
 		UpdateContext: updateRoutingPolicy,

@@ -3,12 +3,12 @@
 page_title: "protomesh_instance_set Resource - protomesh"
 subcategory: ""
 description: |-
-  Expose a AWS Lambda through a gRPC interface
+  Instance set is a group of instances serving the same service through a well known port.
 ---
 
 # protomesh_instance_set (Resource)
 
-Expose a AWS Lambda through a gRPC interface
+Instance set is a group of instances serving the same service through a well known port.
 
 
 
@@ -33,19 +33,17 @@ Expose a AWS Lambda through a gRPC interface
 
 Optional:
 
-- `instances` (Block List) (see [below for nested schema](#nestedblock--node--instances))
-- `match_service_names` (List of String)
+- `instances` (Block List) Instances in this set. (see [below for nested schema](#nestedblock--node--instances))
+- `match_service_names` (List of String) Services names to match instan
 
 <a id="nestedblock--node--instances"></a>
 ### Nested Schema for `node.instances`
 
 Optional:
 
-- `address` (String)
-- `hostname` (String) Unique identifier for this instance
-- `port` (Number)
-- `region` (String)
-- `transport_protocol` (String)
-- `zone` (String)
+- `address` (String) Instance address (IPv4 or DNS).
+- `hostname` (String) Unique identifier for this instance.
+- `port` (Number) Port number where the service is available.
+- `transport_protocol` (String) Transport protocol available in the instance port.
 
 

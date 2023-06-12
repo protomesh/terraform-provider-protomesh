@@ -16,7 +16,7 @@ func DataSourceAwsLambdaGrpc() *schema.Resource {
 
 func ResourceAwsLambdaGrpc() *schema.Resource {
 	return &schema.Resource{
-		Description:   "Expose a AWS Lambda through a gRPC interface",
+		Description:   "Expose a AWS Lambda through a gRPC interface. It uses the Protomesh Gateway to expose the gRPC method.",
 		CreateContext: createAwsLambdaGrpc,
 		ReadContext:   readAwsLambdaGrpc,
 		UpdateContext: updateAwsLambdaGrpc,

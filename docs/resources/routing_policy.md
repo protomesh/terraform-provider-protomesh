@@ -3,12 +3,12 @@
 page_title: "protomesh_routing_policy Resource - protomesh"
 subcategory: ""
 description: |-
-  Expose a AWS Lambda through a gRPC interface
+  Defines how the HTTP Ingress routes requests to services.
 ---
 
 # protomesh_routing_policy (Resource)
 
-Expose a AWS Lambda through a gRPC interface
+Defines how the HTTP Ingress routes requests to services.
 
 
 
@@ -33,10 +33,10 @@ Expose a AWS Lambda through a gRPC interface
 
 Optional:
 
-- `cors` (Block List, Max: 1) (see [below for nested schema](#nestedblock--node--cors))
-- `domain` (String)
-- `ingress_name` (String)
-- `routes` (Block List) (see [below for nested schema](#nestedblock--node--routes))
+- `cors` (Block List, Max: 1) Cors policy to apply in this routing policy. (see [below for nested schema](#nestedblock--node--cors))
+- `domain` (String) Domain to match (you can use wildcard domains).
+- `ingress_name` (String) Ingress name to match this routing policy.
+- `routes` (Block List) Routes in this routing policy. (see [below for nested schema](#nestedblock--node--routes))
 - `xds_cluster_name` (String) XDS cluster name: must be the same of the envoy config to be matched by  xDS server
 
 <a id="nestedblock--node--cors"></a>
@@ -44,11 +44,11 @@ Optional:
 
 Optional:
 
-- `allow_headers` (List of String)
-- `allow_methods` (List of String)
-- `allow_origin_string_match_prefix` (List of String)
-- `expose_headers` (List of String)
-- `max_age` (Number)
+- `allow_headers` (List of String) Specifies the content for the access-control-allow-headers header.
+- `allow_methods` (List of String) Specifies the content for the access-control-allow-methods header.
+- `allow_origin_string_match_prefix` (List of String) Specifies string patterns that match allowed origins. An origin is allowed if any of the string matchers match.
+- `expose_headers` (List of String) Specifies the content for the access-control-expose-headers header.
+- `max_age` (Number) Specifies the content for the access-control-max-age header.
 
 
 <a id="nestedblock--node--routes"></a>
@@ -56,8 +56,8 @@ Optional:
 
 Optional:
 
-- `match_prefix` (String)
-- `target_service` (String)
-- `timeout` (Number)
+- `match_prefix` (String) Path prefix in the request to match.
+- `target_service` (String) Target service name when this route matches.
+- `timeout` (Number) Timeout to connect to service in this route.
 
 

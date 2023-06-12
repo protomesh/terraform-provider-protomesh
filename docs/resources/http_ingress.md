@@ -3,12 +3,12 @@
 page_title: "protomesh_http_ingress Resource - protomesh"
 subcategory: ""
 description: |-
-  Expose a AWS Lambda through a gRPC interface
+  HTTP Ingress (a.k.a reverse proxy). Usually this ingress is the upstream of a network load balancer.
 ---
 
 # protomesh_http_ingress (Resource)
 
-Expose a AWS Lambda through a gRPC interface
+HTTP Ingress (a.k.a reverse proxy). Usually this ingress is the upstream of a network load balancer.
 
 
 
@@ -33,10 +33,10 @@ Expose a AWS Lambda through a gRPC interface
 
 Optional:
 
-- `http_filters` (Block List) Http filters to apply to the ingress listener (see [below for nested schema](#nestedblock--node--http_filters))
-- `ingress_name` (String) Ingress name (used as route config name for the route specifier)
-- `listen_port` (Number) Ingress port to listen for incoming requests
-- `xds_cluster_name` (String) XDS cluster name: must be the same of the envoy config to be matched by  xDS server
+- `http_filters` (Block List) Http filters to apply to the ingress listener. (see [below for nested schema](#nestedblock--node--http_filters))
+- `ingress_name` (String) Ingress name (used as route config name for the route specifier).
+- `listen_port` (Number) Ingress port to listen for incoming requests.
+- `xds_cluster_name` (String) XDS cluster name: must be the same of the envoy config to be matched by  xDS server.
 
 <a id="nestedblock--node--http_filters"></a>
 ### Nested Schema for `node.http_filters`
@@ -50,10 +50,10 @@ Optional:
 
 Optional:
 
-- `cors` (Block List, Max: 1) (see [below for nested schema](#nestedblock--node--http_filters--filter--cors))
-- `grpc_web` (Block List, Max: 1) (see [below for nested schema](#nestedblock--node--http_filters--filter--grpc_web))
-- `health_check` (Block List, Max: 1) (see [below for nested schema](#nestedblock--node--http_filters--filter--health_check))
-- `jwt_authn` (Block List, Max: 1) (see [below for nested schema](#nestedblock--node--http_filters--filter--jwt_authn))
+- `cors` (Block List, Max: 1) Cors filter. (see [below for nested schema](#nestedblock--node--http_filters--filter--cors))
+- `grpc_web` (Block List, Max: 1) grpc-web filter. (see [below for nested schema](#nestedblock--node--http_filters--filter--grpc_web))
+- `health_check` (Block List, Max: 1) Health check filter. (see [below for nested schema](#nestedblock--node--http_filters--filter--health_check))
+- `jwt_authn` (Block List, Max: 1) JWT Authentication filter. (see [below for nested schema](#nestedblock--node--http_filters--filter--jwt_authn))
 
 <a id="nestedblock--node--http_filters--filter--cors"></a>
 ### Nested Schema for `node.http_filters.filter.cors`
@@ -68,7 +68,7 @@ Optional:
 
 Required:
 
-- `path` (String)
+- `path` (String) Path is equivalent to check the 'path' header in the HTTP request.  Usually this is set to '/healthz'.
 
 
 <a id="nestedblock--node--http_filters--filter--jwt_authn"></a>
@@ -76,32 +76,32 @@ Required:
 
 Optional:
 
-- `providers` (Block List) (see [below for nested schema](#nestedblock--node--http_filters--filter--jwt_authn--providers))
-- `rules` (Block List) (see [below for nested schema](#nestedblock--node--http_filters--filter--jwt_authn--rules))
+- `providers` (Block List) List of providers. (see [below for nested schema](#nestedblock--node--http_filters--filter--jwt_authn--providers))
+- `rules` (Block List) List of rules. (see [below for nested schema](#nestedblock--node--http_filters--filter--jwt_authn--rules))
 
 <a id="nestedblock--node--http_filters--filter--jwt_authn--providers"></a>
 ### Nested Schema for `node.http_filters.filter.jwt_authn.providers`
 
 Required:
 
-- `forward` (Boolean)
-- `issuer` (String)
-- `provider_name` (String)
+- `forward` (Boolean) Forward the JWT token to the upstream.
+- `issuer` (String) Specify the principal that issued the JWT, usually a URL or an email address.  It is optional. If specified, it has to match the iss field in JWT, otherwise the JWT iss field is not checked.
+- `provider_name` (String) Provider name to be used in the rules for matching requests.
 
 Optional:
 
-- `audiences` (List of String)
-- `claim_to_headers` (Block List) (see [below for nested schema](#nestedblock--node--http_filters--filter--jwt_authn--providers--claim_to_headers))
-- `from_headers` (Block List) (see [below for nested schema](#nestedblock--node--http_filters--filter--jwt_authn--providers--from_headers))
-- `remote_jwks` (Block List, Max: 1) (see [below for nested schema](#nestedblock--node--http_filters--filter--jwt_authn--providers--remote_jwks))
+- `audiences` (List of String) The list of JWT audiences are allowed to access.  A JWT containing any of these audiences will be accepted.  If not specified, will not check audiences in the token.
+- `claim_to_headers` (Block List) Add JWT claim to HTTP Header Specify the claim name you want to  copy in which HTTP header. For examples, following config:  The claim must be of type; string, int, double, bool.  Array type claims are not supported. (see [below for nested schema](#nestedblock--node--http_filters--filter--jwt_authn--providers--claim_to_headers))
+- `from_headers` (Block List) Define where to extract the JWT from an HTTP request. (see [below for nested schema](#nestedblock--node--http_filters--filter--jwt_authn--providers--from_headers))
+- `remote_jwks` (Block List, Max: 1) JWKS can be fetched from remote server via HTTP/HTTPS.  This field specifies the remote HTTP URI and how the fetched JWKS should be cached. (see [below for nested schema](#nestedblock--node--http_filters--filter--jwt_authn--providers--remote_jwks))
 
 <a id="nestedblock--node--http_filters--filter--jwt_authn--providers--claim_to_headers"></a>
 ### Nested Schema for `node.http_filters.filter.jwt_authn.providers.claim_to_headers`
 
 Optional:
 
-- `claim_name` (String)
-- `header_name` (String)
+- `claim_name` (String) ClaimName is the claim in the JWT token to acquire the value.
+- `header_name` (String) HeaderName is the header name to put the acquired value.
 
 
 <a id="nestedblock--node--http_filters--filter--jwt_authn--providers--from_headers"></a>
@@ -109,8 +109,8 @@ Optional:
 
 Required:
 
-- `header_name` (String)
-- `value_prefix` (String)
+- `header_name` (String) This is the header name to get the JWT. Example: 'Authorization'
+- `value_prefix` (String) ValuePrefix specifies a prefix in the value before the JWT token to be removed.  Example: 'Bearer '
 
 
 <a id="nestedblock--node--http_filters--filter--jwt_authn--providers--remote_jwks"></a>
@@ -132,7 +132,7 @@ Optional:
 
 Optional:
 
-- `match_prefix` (String)
-- `required_providers_names` (List of String)
+- `match_prefix` (String) When the path parameter matches the specified prefixes.
+- `required_providers_names` (List of String) Then it's required that the JWT token signature is valid for at least one of  the following providers referenced by its name.
 
 
