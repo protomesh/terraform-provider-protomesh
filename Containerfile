@@ -19,7 +19,6 @@ RUN go mod download
 
 COPY . ./
 
-RUN buf generate
 RUN go generate
 
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o ${APP_EXECUTABLE} ./terraform
