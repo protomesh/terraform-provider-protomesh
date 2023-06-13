@@ -44,6 +44,8 @@ Optional:
 - `address` (String) Instance address (IPv4 or DNS).
 - `hostname` (String) Unique identifier for this instance.
 - `port` (Number) Port number where the service is available.
+- `region` (String) Instance region.
 - `transport_protocol` (String) Transport protocol available in the instance port.
+- `zone` (String) Instance zone within the region.
 
 
