@@ -204,6 +204,7 @@ func Provider() *schema.Provider {
 			"protomesh_http_ingress":    resources.ResourceHttpIngress(),
 			"protomesh_instance_set":    resources.ResourceInstanceSet(),
 			"protomesh_routing_policy":  resources.ResourceRoutingPolicy(),
+			"protomesh_process_trigger": resources.ResourceProcessTrigger(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"protomesh_aws_lambda_grpc": resources.DataSourceAwsLambdaGrpc(),
@@ -211,6 +212,7 @@ func Provider() *schema.Provider {
 			"protomesh_http_ingress":    resources.DataSourceHttpIngress(),
 			"protomesh_instance_set":    resources.DataSourceInstanceSet(),
 			"protomesh_routing_policy":  resources.DataSourceRoutingPolicy(),
+			"protomesh_process_trigger": resources.DataSourceProcessTrigger(),
 		},
 	}
 }

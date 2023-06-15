@@ -11,6 +11,8 @@ import (
 func DataSourceService() *schema.Resource {
 	return &schema.Resource{
 		ReadContext: getService,
+
+		Schema: makeDataSourceSchema("node", typesv1.NewServiceSchema()),
 	}
 }
 
@@ -25,13 +27,13 @@ func ResourceService() *schema.Resource {
 			StateContext: schema.ImportStatePassthroughContext,
 		},
 
-		Schema: makeResourceSchema(typesv1.NewServiceSchema()),
+		Schema: makeResourceSchema("node", typesv1.NewServiceSchema()),
 	}
 }
 
 func createService(ctx context.Context, rd *schema.ResourceData, i interface{}) diag.Diagnostics {
 
-	nodeData, diagErr := nodeDataFromResourceData(rd)
+	nodeData, diagErr := itemDataFromResourceData("node", rd)
 	if diagErr != nil {
 		return diagErr
 	}

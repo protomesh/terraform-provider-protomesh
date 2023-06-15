@@ -11,6 +11,8 @@ import (
 func DataSourceInstanceSet() *schema.Resource {
 	return &schema.Resource{
 		ReadContext: getInstanceSet,
+
+		Schema: makeDataSourceSchema("node", typesv1.NewInstanceSetSchema()),
 	}
 }
 
@@ -25,13 +27,13 @@ func ResourceInstanceSet() *schema.Resource {
 			StateContext: schema.ImportStatePassthroughContext,
 		},
 
-		Schema: makeResourceSchema(typesv1.NewInstanceSetSchema()),
+		Schema: makeResourceSchema("node", typesv1.NewInstanceSetSchema()),
 	}
 }
 
 func createInstanceSet(ctx context.Context, rd *schema.ResourceData, i interface{}) diag.Diagnostics {
 
-	nodeData, diagErr := nodeDataFromResourceData(rd)
+	nodeData, diagErr := itemDataFromResourceData("node", rd)
 	if diagErr != nil {
 		return diagErr
 	}

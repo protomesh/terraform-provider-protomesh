@@ -18,7 +18,7 @@ type dependencies interface {
 	GetResourceStoreClient() servicesv1.ResourceStoreClient
 }
 
-func makeResourceSchema(nodeSchema map[string]*schema.Schema) map[string]*schema.Schema {
+func makeResourceSchema(key string, sch map[string]*schema.Schema) map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"namespace": {
 			Description:  "Namespace in the resource store",
@@ -40,14 +40,14 @@ func makeResourceSchema(nodeSchema map[string]*schema.Schema) map[string]*schema
 			Required:     true,
 			ValidateFunc: validation.StringLenBetween(1, 250),
 		},
-		"node": {
+		key: {
 			Description: "Node specification.",
 			Type:        schema.TypeList,
 			MaxItems:    1,
 			MinItems:    1,
 			Required:    true,
 			Elem: &schema.Resource{
-				Schema: nodeSchema,
+				Schema: sch,
 			},
 		},
 		"version_index": {
@@ -134,7 +134,7 @@ func dropResource(ctx context.Context, rd *schema.ResourceData, i interface{}) d
 
 }
 
-func makeDataSourceSchema(r *schema.Resource) map[string]*schema.Schema {
+func makeDataSourceSchema(key string, sch map[string]*schema.Schema) map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"namespace": {
 			Description:  "Namespace in the resource store",
@@ -155,11 +155,13 @@ func makeDataSourceSchema(r *schema.Resource) map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 		},
-		"spec": {
-			Description: "Resource specification (payload)",
+		key: {
+			Description: "Node specification.",
 			Type:        schema.TypeList,
 			Computed:    true,
-			Elem:        r,
+			Elem: &schema.Resource{
+				Schema: sch,
+			},
 		},
 		"version_index": {
 			Description: "Resource version index (unix timestamp in seconds)",
@@ -191,11 +193,11 @@ func resourceFromResourceData(rd *schema.ResourceData, spec proto.Message) (*typ
 
 }
 
-func nodeDataFromResourceData(rd *schema.ResourceData) (map[string]interface{}, diag.Diagnostics) {
+func itemDataFromResourceData(key string, rd *schema.ResourceData) (map[string]interface{}, diag.Diagnostics) {
 
-	list, ok := rd.Get("node").([]interface{})
+	list, ok := rd.Get(key).([]interface{})
 	if !ok || len(list) != 1 {
-		return nil, diag.Errorf("Missing node definition")
+		return nil, diag.Errorf("Missing %s definition", key)
 	}
 
 	return list[0].(map[string]interface{}), nil

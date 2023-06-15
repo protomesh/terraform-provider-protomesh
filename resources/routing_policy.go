@@ -11,6 +11,8 @@ import (
 func DataSourceRoutingPolicy() *schema.Resource {
 	return &schema.Resource{
 		ReadContext: getRoutingPolicy,
+
+		Schema: makeDataSourceSchema("node", typesv1.NewRoutingPolicySchema()),
 	}
 }
 
@@ -25,13 +27,13 @@ func ResourceRoutingPolicy() *schema.Resource {
 			StateContext: schema.ImportStatePassthroughContext,
 		},
 
-		Schema: makeResourceSchema(typesv1.NewRoutingPolicySchema()),
+		Schema: makeResourceSchema("node", typesv1.NewRoutingPolicySchema()),
 	}
 }
 
 func createRoutingPolicy(ctx context.Context, rd *schema.ResourceData, i interface{}) diag.Diagnostics {
 
-	nodeData, diagErr := nodeDataFromResourceData(rd)
+	nodeData, diagErr := itemDataFromResourceData("node", rd)
 	if diagErr != nil {
 		return diagErr
 	}

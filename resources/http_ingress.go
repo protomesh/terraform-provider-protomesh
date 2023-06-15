@@ -11,6 +11,8 @@ import (
 func DataSourceHttpIngress() *schema.Resource {
 	return &schema.Resource{
 		ReadContext: getHttpIngress,
+
+		Schema: makeDataSourceSchema("node", typesv1.NewHttpIngressSchema()),
 	}
 }
 
@@ -25,13 +27,13 @@ func ResourceHttpIngress() *schema.Resource {
 			StateContext: schema.ImportStatePassthroughContext,
 		},
 
-		Schema: makeResourceSchema(typesv1.NewHttpIngressSchema()),
+		Schema: makeResourceSchema("node", typesv1.NewHttpIngressSchema()),
 	}
 }
 
 func createHttpIngress(ctx context.Context, rd *schema.ResourceData, i interface{}) diag.Diagnostics {
 
-	nodeData, diagErr := nodeDataFromResourceData(rd)
+	nodeData, diagErr := itemDataFromResourceData("node", rd)
 	if diagErr != nil {
 		return diagErr
 	}

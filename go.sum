@@ -181,6 +181,8 @@ github.com/posener/complete v1.2.3 h1:NP0eAhjcjImqslEwo/1hq7gpajME0fTLTezBKDqfXq
 github.com/posener/complete v1.2.3/go.mod h1:WZIdtGGp+qx0sLrYKtIRAruyNpv6hFCicSgv7Sy7s/s=
 github.com/protomesh/protoc-gen-terraform v0.0.0-20230611213902-f67e4cee519f h1:rRy6AN44EhwGKsN7wcExPV40Hc8E/FcTTwy3z5Ua07U=
 github.com/protomesh/protoc-gen-terraform v0.0.0-20230611213902-f67e4cee519f/go.mod h1:OYFkefdlGI0qv4LkqoBOBgo4QLDCR0tYoai3b3DVhoE=
+github.com/protomesh/protoc-gen-terraform v0.0.0-20230613213824-8b67d9b8077d h1:BYLEigr8MRLCnpxX9dt9B7sJ5Z4qnmiIp/dwiQB1pvk=
+github.com/protomesh/protoc-gen-terraform v0.0.0-20230613213824-8b67d9b8077d/go.mod h1:wb/6eAY+u97eVSSnE2xBPMAap7BFRe13eF5RupiiBOE=
 github.com/protomesh/protomesh v0.0.0-20230611213828-a8506ff18ffa h1:jow0Qtf89+odvmWYpfQyfHJT/YilY5JOBSEoexd+qgU=
 github.com/protomesh/protomesh v0.0.0-20230611213828-a8506ff18ffa/go.mod h1:/qEoOjFzP0lRiIIjYisNLZcfgykGkaO50U4Njs3umSY=
 github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=

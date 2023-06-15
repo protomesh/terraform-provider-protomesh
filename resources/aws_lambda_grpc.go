@@ -11,6 +11,8 @@ import (
 func DataSourceAwsLambdaGrpc() *schema.Resource {
 	return &schema.Resource{
 		ReadContext: getAwsLambdaGrpc,
+
+		Schema: makeDataSourceSchema("node", typesv1.NewAwsLambdaGrpcSchema()),
 	}
 }
 
@@ -25,13 +27,13 @@ func ResourceAwsLambdaGrpc() *schema.Resource {
 			StateContext: schema.ImportStatePassthroughContext,
 		},
 
-		Schema: makeResourceSchema(typesv1.NewAwsLambdaGrpcSchema()),
+		Schema: makeResourceSchema("node", typesv1.NewAwsLambdaGrpcSchema()),
 	}
 }
 
 func createAwsLambdaGrpc(ctx context.Context, rd *schema.ResourceData, i interface{}) diag.Diagnostics {
 
-	nodeData, diagErr := nodeDataFromResourceData(rd)
+	nodeData, diagErr := itemDataFromResourceData("node", rd)
 	if diagErr != nil {
 		return diagErr
 	}
