@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/protomesh/protomesh"
+	"github.com/protomesh/go-app"
 	"github.com/protomesh/protomesh/pkg/client"
 	"github.com/protomesh/protomesh/pkg/config"
 	"github.com/protomesh/protomesh/provider/tls"
@@ -72,7 +72,7 @@ func (p *providerLogger) Panic(message string, kv ...interface{}) {
 	os.Exit(1)
 }
 
-func (p *providerLogger) With(kv ...interface{}) protomesh.Logger {
+func (p *providerLogger) With(kv ...interface{}) app.Logger {
 	return &providerLogger{
 		ctx:  p.ctx,
 		name: p.name,
@@ -80,19 +80,15 @@ func (p *providerLogger) With(kv ...interface{}) protomesh.Logger {
 	}
 }
 
-type providerApp[D any] struct {
+type providerApp struct {
 	log *providerLogger
 }
 
-func (a *providerApp[D]) Config() protomesh.ConfigSource {
-	return nil
-}
-
-func (a *providerApp[D]) Log() protomesh.Logger {
+func (a *providerApp) Log() app.Logger {
 	return a.log
 }
 
-func (a *providerApp[D]) Close() {
+func (a *providerApp) Close() {
 }
 
 type providerDeps struct {
@@ -184,7 +180,7 @@ func Provider() *schema.Provider {
 				deps.GrpcClient.TlsBuilder.PrivateKey.KeysPath = config.NewConfig(tlsPrivPath)
 			}
 
-			app := &providerApp[*providerDeps]{
+			provApp := &providerApp{
 				log: &providerLogger{
 					ctx:  ctx,
 					name: "protomesh",
@@ -192,7 +188,7 @@ func Provider() *schema.Provider {
 				},
 			}
 
-			protomesh.Inject(app, deps)
+			app.Inject(provApp, deps)
 
 			deps.GrpcClient.Start()
 
