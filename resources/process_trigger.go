@@ -38,14 +38,9 @@ func createProcessTrigger(ctx context.Context, rd *schema.ResourceData, i interf
 		return diagErr
 	}
 
-	protoJsonMap, err := typesv1.UnmarshalTrigger(triggerData)
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
 	trigger := &typesv1.Trigger{}
 
-	if err := typesv1.UnmarshalTriggerProto(protoJsonMap, trigger); err != nil {
+	if err := typesv1.UnmarshalTriggerProto(triggerData, trigger); err != nil {
 		return diag.FromErr(err)
 	}
 

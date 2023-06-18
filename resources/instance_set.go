@@ -38,14 +38,9 @@ func createInstanceSet(ctx context.Context, rd *schema.ResourceData, i interface
 		return diagErr
 	}
 
-	protoJsonMap, err := typesv1.UnmarshalInstanceSet(nodeData)
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
 	node := &typesv1.InstanceSet{}
 
-	if err := typesv1.UnmarshalInstanceSetProto(protoJsonMap, node); err != nil {
+	if err := typesv1.UnmarshalInstanceSetProto(nodeData, node); err != nil {
 		return diag.FromErr(err)
 	}
 
@@ -95,7 +90,6 @@ func readInstanceSet(ctx context.Context, rd *schema.ResourceData, i interface{}
 		if err != nil {
 			return diag.FromErr(err)
 		}
-		// panic(fmt.Sprintf("%+v", node))
 
 		rd.Set("node", []interface{}{node})
 

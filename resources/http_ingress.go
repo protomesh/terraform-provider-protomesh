@@ -38,14 +38,9 @@ func createHttpIngress(ctx context.Context, rd *schema.ResourceData, i interface
 		return diagErr
 	}
 
-	protoJsonMap, err := typesv1.UnmarshalHttpIngress(nodeData)
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
 	node := &typesv1.HttpIngress{}
 
-	if err := typesv1.UnmarshalHttpIngressProto(protoJsonMap, node); err != nil {
+	if err := typesv1.UnmarshalHttpIngressProto(nodeData, node); err != nil {
 		return diag.FromErr(err)
 	}
 
@@ -95,7 +90,6 @@ func readHttpIngress(ctx context.Context, rd *schema.ResourceData, i interface{}
 		if err != nil {
 			return diag.FromErr(err)
 		}
-		// panic(fmt.Sprintf("%+v", node))
 
 		rd.Set("node", []interface{}{node})
 

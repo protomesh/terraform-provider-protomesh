@@ -18,7 +18,7 @@ func DataSourceGatewayPolicy() *schema.Resource {
 
 func ResourceGatewayPolicy() *schema.Resource {
 	return &schema.Resource{
-		Description:   "Expose a AWS Lambda through a gRPC interface. It uses the Protomesh Gateway to expose the gRPC method.",
+		Description:   "Defines a gateway policy",
 		CreateContext: createGatewayPolicy,
 		ReadContext:   readGatewayPolicy,
 		UpdateContext: updateGatewayPolicy,
@@ -38,14 +38,9 @@ func createGatewayPolicy(ctx context.Context, rd *schema.ResourceData, i interfa
 		return diagErr
 	}
 
-	protoJsonMap, err := typesv1.UnmarshalGatewayPolicy(policyData)
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
 	policy := &typesv1.GatewayPolicy{}
 
-	if err := typesv1.UnmarshalGatewayPolicyProto(protoJsonMap, policy); err != nil {
+	if err := typesv1.UnmarshalGatewayPolicyProto(policyData, policy); err != nil {
 		return diag.FromErr(err)
 	}
 

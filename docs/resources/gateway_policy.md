@@ -3,12 +3,12 @@
 page_title: "protomesh_gateway_policy Resource - protomesh"
 subcategory: ""
 description: |-
-  Expose a AWS Lambda through a gRPC interface. It uses the Protomesh Gateway to expose the gRPC method.
+  Defines a gateway policy
 ---
 
 # protomesh_gateway_policy (Resource)
 
-Expose a AWS Lambda through a gRPC interface. It uses the Protomesh Gateway to expose the gRPC method.
+Defines a gateway policy
 
 
 

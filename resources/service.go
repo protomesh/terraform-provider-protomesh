@@ -38,14 +38,9 @@ func createService(ctx context.Context, rd *schema.ResourceData, i interface{}) 
 		return diagErr
 	}
 
-	protoJsonMap, err := typesv1.UnmarshalService(nodeData)
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
 	node := &typesv1.Service{}
 
-	if err := typesv1.UnmarshalServiceProto(protoJsonMap, node); err != nil {
+	if err := typesv1.UnmarshalServiceProto(nodeData, node); err != nil {
 		return diag.FromErr(err)
 	}
 

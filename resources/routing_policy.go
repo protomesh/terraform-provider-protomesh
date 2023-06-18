@@ -38,14 +38,9 @@ func createRoutingPolicy(ctx context.Context, rd *schema.ResourceData, i interfa
 		return diagErr
 	}
 
-	protoJsonMap, err := typesv1.UnmarshalRoutingPolicy(nodeData)
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
 	node := &typesv1.RoutingPolicy{}
 
-	if err := typesv1.UnmarshalRoutingPolicyProto(protoJsonMap, node); err != nil {
+	if err := typesv1.UnmarshalRoutingPolicyProto(nodeData, node); err != nil {
 		return diag.FromErr(err)
 	}
 
