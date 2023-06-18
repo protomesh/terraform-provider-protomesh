@@ -12,91 +12,6 @@ import (
 	protomeshpb "github.com/protomesh/protoc-gen-terraform/pkg/protobuf"
 )
 
-func NewTriggerRetryPolicySchema() map[string]*schema.Schema {
-	return map[string]*schema.Schema{
-		"initial_interval": {
-			Type:     schema.TypeInt,
-			Required: true,
-			Default:  time.Duration(30000000000),
-		},
-		"maximum_backoff": {
-			Type:        schema.TypeInt,
-			Optional:    true,
-			Description: "Maximum backoff interval between retries. Exponential backoff leads to  interval increase. This value is the cap of the interval. Default is 100x  of initial interval.",
-		},
-		"maximum_attempts": {
-			Type:        schema.TypeInt,
-			Optional:    true,
-			Description: "Maximum number of attempts. When exceeded the retries stop even if not  expired yet. If not set or set to 0, it means unlimited, and rely on  activity ScheduleToCloseTimeout to stop.",
-		},
-		"non_retryable_errors": {
-			Type:        schema.TypeList,
-			Optional:    true,
-			Description: "Non-Retriable errors. This is optional. Temporal server will stop retry  if error type matches this list. Note:   - cancellation is not a failure, so it won't be retried,   - only StartToClose or Heartbeat timeouts are retryable.",
-			Elem: &schema.Schema{
-				Type: schema.TypeString,
-			},
-		},
-	}
-}
-
-func UnmarshalTriggerRetryPolicy(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	if valueMaximumAttempts, okMaximumAttempts := obj["maximum_attempts"].(int32); okMaximumAttempts {
-		p["maximum_attempts"] = valueMaximumAttempts
-	}
-	if valueNonRetryableErrors, okNonRetryableErrors := obj["non_retryable_errors"].([]interface{}); okNonRetryableErrors {
-		list := valueNonRetryableErrors
-		r := []string{}
-		for _, val := range list {
-			r = append(r, val.(string))
-		}
-		p["non_retryable_errors"] = r
-	}
-	return p, nil
-}
-
-func UnmarshalTriggerRetryPolicyProto(obj map[string]interface{}, m proto.Message) error {
-	d, err := UnmarshalTriggerRetryPolicy(obj)
-	if err != nil {
-		return err
-	}
-	b, err := json.Marshal(d)
-	if err != nil {
-		return err
-	}
-	if err := protojson.Unmarshal(b, m); err != nil {
-		return err
-	}
-	return nil
-}
-
-func MarshalTriggerRetryPolicy(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	p["maximum_attempts"], _ = obj["maximum_attempts"].(int32)
-	if l, ok := obj["non_retryable_errors"].([]interface{}); ok {
-		p["non_retryable_errors"] = []interface{}{}
-		for _, i := range l {
-			d := i.(string)
-			p["non_retryable_errors"] = append(p["non_retryable_errors"].([]interface{}), d)
-		}
-	}
-	return p, nil
-}
-
-func MarshalTriggerRetryPolicyProto(m proto.Message) (map[string]interface{}, error) {
-	obj := map[string]interface{}{}
-	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(b, &obj)
-	if err != nil {
-		return nil, err
-	}
-	return MarshalTriggerRetryPolicy(obj)
-}
-
 func NewProcessSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"process": {
@@ -251,8 +166,8 @@ func NewTriggerSchema() map[string]*schema.Schema {
 					},
 					"id_suffix_builder": {
 						Type:         schema.TypeString,
-						Optional:     true,
 						ValidateFunc: validation.StringInSlice([]string{"ID_BUILDER_ONLY_PREFIX", "ID_BUILDER_RANDOM", "ID_BUILDER_UNIQUE"}, false),
+						Optional:     true,
 						Description:  "ID builder to use to generate the suffix.",
 					},
 				},
@@ -266,8 +181,8 @@ func NewTriggerSchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 					"if_running_action": {
 						Type:         schema.TypeString,
-						Optional:     true,
 						ValidateFunc: validation.StringInSlice([]string{"IF_RUNNING_ABORT", "IF_RUNNING_OVERLAP"}, false),
+						Optional:     true,
 					},
 				},
 			},
@@ -280,8 +195,8 @@ func NewTriggerSchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 					"on_drop_action": {
 						Type:         schema.TypeString,
-						Optional:     true,
 						ValidateFunc: validation.StringInSlice([]string{"ON_DROP_DO_NOTHING", "ON_DROP_CANCEL", "ON_DROP_TERMINATE"}, false),
+						Optional:     true,
 						Description:  "On drop action.",
 					},
 				},
@@ -420,4 +335,89 @@ func MarshalTriggerProto(m proto.Message) (map[string]interface{}, error) {
 		return nil, err
 	}
 	return MarshalTrigger(obj)
+}
+
+func NewTriggerRetryPolicySchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		"initial_interval": {
+			Type:     schema.TypeInt,
+			Optional: true,
+			Default:  time.Duration(30000000000),
+		},
+		"maximum_backoff": {
+			Type:        schema.TypeInt,
+			Optional:    true,
+			Description: "Maximum backoff interval between retries. Exponential backoff leads to  interval increase. This value is the cap of the interval. Default is 100x  of initial interval.",
+		},
+		"maximum_attempts": {
+			Type:        schema.TypeInt,
+			Optional:    true,
+			Description: "Maximum number of attempts. When exceeded the retries stop even if not  expired yet. If not set or set to 0, it means unlimited, and rely on  activity ScheduleToCloseTimeout to stop.",
+		},
+		"non_retryable_errors": {
+			Type:        schema.TypeList,
+			Optional:    true,
+			Description: "Non-Retriable errors. This is optional. Temporal server will stop retry  if error type matches this list. Note:   - cancellation is not a failure, so it won't be retried,   - only StartToClose or Heartbeat timeouts are retryable.",
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
+		},
+	}
+}
+
+func UnmarshalTriggerRetryPolicy(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	if valueMaximumAttempts, okMaximumAttempts := obj["maximum_attempts"].(int32); okMaximumAttempts {
+		p["maximum_attempts"] = valueMaximumAttempts
+	}
+	if valueNonRetryableErrors, okNonRetryableErrors := obj["non_retryable_errors"].([]interface{}); okNonRetryableErrors {
+		list := valueNonRetryableErrors
+		r := []string{}
+		for _, val := range list {
+			r = append(r, val.(string))
+		}
+		p["non_retryable_errors"] = r
+	}
+	return p, nil
+}
+
+func UnmarshalTriggerRetryPolicyProto(obj map[string]interface{}, m proto.Message) error {
+	d, err := UnmarshalTriggerRetryPolicy(obj)
+	if err != nil {
+		return err
+	}
+	b, err := json.Marshal(d)
+	if err != nil {
+		return err
+	}
+	if err := protojson.Unmarshal(b, m); err != nil {
+		return err
+	}
+	return nil
+}
+
+func MarshalTriggerRetryPolicy(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	p["maximum_attempts"], _ = obj["maximum_attempts"].(int32)
+	if l, ok := obj["non_retryable_errors"].([]interface{}); ok {
+		p["non_retryable_errors"] = []interface{}{}
+		for _, i := range l {
+			d := i.(string)
+			p["non_retryable_errors"] = append(p["non_retryable_errors"].([]interface{}), d)
+		}
+	}
+	return p, nil
+}
+
+func MarshalTriggerRetryPolicyProto(m proto.Message) (map[string]interface{}, error) {
+	obj := map[string]interface{}{}
+	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(b, &obj)
+	if err != nil {
+		return nil, err
+	}
+	return MarshalTriggerRetryPolicy(obj)
 }

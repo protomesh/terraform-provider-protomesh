@@ -92,6 +92,8 @@ func (a *providerApp) Close() {
 }
 
 type providerDeps struct {
+	*app.Injector[*providerDeps]
+
 	GrpcClient *client.GrpcClient[any]
 }
 
@@ -195,7 +197,7 @@ func Provider() *schema.Provider {
 			return deps, nil
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"protomesh_aws_lambda_grpc": resources.ResourceAwsLambdaGrpc(),
+			"protomesh_gateway_policy":  resources.ResourceGatewayPolicy(),
 			"protomesh_service":         resources.ResourceService(),
 			"protomesh_http_ingress":    resources.ResourceHttpIngress(),
 			"protomesh_instance_set":    resources.ResourceInstanceSet(),
@@ -203,7 +205,7 @@ func Provider() *schema.Provider {
 			"protomesh_process_trigger": resources.ResourceProcessTrigger(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
-			"protomesh_aws_lambda_grpc": resources.DataSourceAwsLambdaGrpc(),
+			"protomesh_gateway_policy":  resources.DataSourceGatewayPolicy(),
 			"protomesh_service":         resources.DataSourceService(),
 			"protomesh_http_ingress":    resources.DataSourceHttpIngress(),
 			"protomesh_instance_set":    resources.DataSourceInstanceSet(),

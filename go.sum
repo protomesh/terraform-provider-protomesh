@@ -181,12 +181,12 @@ github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZN
 github.com/posener/complete v1.1.1/go.mod h1:em0nMJCgc9GFtwrmVmEMR/ZL6WyhyjMBndrE9hABlRI=
 github.com/posener/complete v1.2.3 h1:NP0eAhjcjImqslEwo/1hq7gpajME0fTLTezBKDqfXqo=
 github.com/posener/complete v1.2.3/go.mod h1:WZIdtGGp+qx0sLrYKtIRAruyNpv6hFCicSgv7Sy7s/s=
-github.com/protomesh/go-app v0.0.0-20230616220145-6e2441b8541a h1:SvQZ5LLAl46071SDHwFY0uyk6l1B/tni115zT9Dod4M=
-github.com/protomesh/go-app v0.0.0-20230616220145-6e2441b8541a/go.mod h1:/gm7Nh3cdqzfRTp16+FkDQyE492x7DWpArE1qwYTh/8=
+github.com/protomesh/go-app v0.2.0 h1:YqYN0eE6aiFwPcxM4AoLqmoNLmbeZG4764xOusexuok=
+github.com/protomesh/go-app v0.2.0/go.mod h1:hIeBScLywUnEcktoP+iblwhGg4xriVsYLS2lpS52/rg=
 github.com/protomesh/protoc-gen-terraform v0.0.0-20230613213824-8b67d9b8077d h1:BYLEigr8MRLCnpxX9dt9B7sJ5Z4qnmiIp/dwiQB1pvk=
 github.com/protomesh/protoc-gen-terraform v0.0.0-20230613213824-8b67d9b8077d/go.mod h1:wb/6eAY+u97eVSSnE2xBPMAap7BFRe13eF5RupiiBOE=
-github.com/protomesh/protomesh v0.0.0-20230611213828-a8506ff18ffa h1:jow0Qtf89+odvmWYpfQyfHJT/YilY5JOBSEoexd+qgU=
-github.com/protomesh/protomesh v0.0.0-20230611213828-a8506ff18ffa/go.mod h1:/qEoOjFzP0lRiIIjYisNLZcfgykGkaO50U4Njs3umSY=
+github.com/protomesh/protomesh v0.1.2-0.20230618185350-e11e72c27274 h1:rv+iK3tYFQ9zMcQiJjdGqYArnFZ0gMBQVovVc4Qya0Q=
+github.com/protomesh/protomesh v0.1.2-0.20230618185350-e11e72c27274/go.mod h1:+I0xmVjbKLinKmHCjVGVBLX7UpLyrg53TjuGjlnJZLs=
 github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
 github.com/rivo/uniseg v0.4.4 h1:8TfxU8dW6PdqD27gjM8MVNuicgxIjxpm4K7x4jp8sis=
 github.com/rivo/uniseg v0.4.4/go.mod h1:FN3SvrM+Zdj16jyLfmOkMNblXMcoc8DfTHruCPUcx88=
@@ -213,7 +213,7 @@ github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/
 github.com/stretchr/testify v1.7.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.7.2/go.mod h1:R6va5+xMeoiuVRoj+gSkQ7d3FALtqAAGI1FQKckRals=
 github.com/stretchr/testify v1.7.4/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO+kdMU+MU=
-github.com/stretchr/testify v1.8.2 h1:+h33VjcLVPDHtOdpUCuF+7gSuG3yGIftsP1YvFihtJ8=
+github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcUk=
 github.com/tidwall/gjson v1.14.4 h1:uo0p8EbA09J7RQaflQ1aBRffTR7xedD2bcIVSYxLnkM=
 github.com/tidwall/gjson v1.14.4/go.mod h1:/wbyibRr2FHMks5tjHJ5F8dMZh3AcwJEMf5vlfC0lxk=
 github.com/tidwall/match v1.1.1 h1:+Ho715JplO36QYgwN9PGYNhgZvoUSc9X2c80KVTi+GA=

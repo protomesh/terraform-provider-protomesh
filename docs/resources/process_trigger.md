@@ -85,12 +85,9 @@ Optional:
 <a id="nestedblock--process--retry_policy"></a>
 ### Nested Schema for `process.retry_policy`
 
-Required:
-
-- `initial_interval` (Number)
-
 Optional:
 
+- `initial_interval` (Number)
 - `maximum_attempts` (Number) Maximum number of attempts. When exceeded the retries stop even if not  expired yet. If not set or set to 0, it means unlimited, and rely on  activity ScheduleToCloseTimeout to stop.
 - `maximum_backoff` (Number) Maximum backoff interval between retries. Exponential backoff leads to  interval increase. This value is the cap of the interval. Default is 100x  of initial interval.
 - `non_retryable_errors` (List of String) Non-Retriable errors. This is optional. Temporal server will stop retry  if error type matches this list. Note:   - cancellation is not a failure, so it won't be retried,   - only StartToClose or Heartbeat timeouts are retryable.
