@@ -48,7 +48,7 @@ Optional:
 - `allow_methods` (List of String) Specifies the content for the access-control-allow-methods header.
 - `allow_origin_string_match_prefix` (List of String) Specifies string patterns that match allowed origins. An origin is allowed if any of the string matchers match.
 - `expose_headers` (List of String) Specifies the content for the access-control-expose-headers header.
-- `max_age` (Number) Specifies the content for the access-control-max-age header.
+- `max_age` (String) Specifies the content for the access-control-max-age header.
 
 
 <a id="nestedblock--node--routes"></a>
@@ -58,6 +58,6 @@ Optional:
 
 - `match_prefix` (String) Path prefix in the request to match.
 - `target_service` (String) Target service name when this route matches.
-- `timeout` (Number) Timeout to connect to service in this route.
+- `timeout` (String) Timeout to connect to service in this route.
 
 

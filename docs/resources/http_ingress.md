@@ -123,7 +123,7 @@ Required:
 
 Optional:
 
-- `timeout` (Number)
+- `timeout` (String)
 
 
 

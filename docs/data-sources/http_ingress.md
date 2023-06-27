@@ -126,7 +126,7 @@ Read-Only:
 
 - `cluster_name` (String)
 - `http_uri` (String)
-- `timeout` (Number)
+- `timeout` (String)
 
 
 

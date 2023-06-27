@@ -121,17 +121,17 @@ func NewTriggerSchema() map[string]*schema.Schema {
 			Description: "Optional cron schedule for workflow. If a cron schedule is specified, the  workflow will run as a cron based on the schedule. The scheduling will be  based on UTC time. Schedule for next run only happen after the current run  is completed/failed/timeout. If a RetryPolicy is also supplied, and the  workflow failed or timeout, the workflow will be retried based on the retry  policy. While the workflow is retrying, it won't schedule its next run. If  next schedule is due while workflow is running (or retrying), then it will  skip that schedule. Cron workflow will not stop until it is terminated or  canceled (by returning temporal.CanceledError). The cron spec is as  following: ┌───────────── minute (0 - 59) │ ┌───────────── hour (0 - 23) │  │ ┌───────────── day of the month (1 - 31) │ │ │ ┌───────────── month (1 -  12) │ │ │ │ ┌───────────── day of the week (0 - 6) (Sunday to Saturday) │ │  │ │ │ │ │ │ │ │  * * * * *",
 		},
 		"execution_timeout": {
-			Type:        schema.TypeInt,
+			Type:        schema.TypeString,
 			Optional:    true,
 			Description: "The end to end timeout for the child workflow execution including retries  and continue as new.  Optional: defaults to unlimited.",
 		},
 		"run_timeout": {
-			Type:        schema.TypeInt,
+			Type:        schema.TypeString,
 			Optional:    true,
 			Description: "The timeout for a single run of the child workflow execution. Each retry or  continue as new should obey this timeout. Use WorkflowExecutionTimeout to  specify how long the parent is willing to wait for the child completion.  Optional: defaults to WorkflowExecutionTimeout",
 		},
 		"task_timeout": {
-			Type:        schema.TypeInt,
+			Type:        schema.TypeString,
 			Optional:    true,
 			Description: "Maximum execution time of a single Workflow Task. In the majority of cases  there is no need to change this timeout. Note that this timeout is not  related to the overall Workflow duration in any way. It defines for how  long the Workflow can get blocked in the case of a Workflow Worker crash.  Default is 10 seconds. Maximum value allowed by the Temporal Server is 1  minute.",
 		},
@@ -219,6 +219,15 @@ func UnmarshalTrigger(obj map[string]interface{}) (map[string]interface{}, error
 	if valueCronSchedule, okCronSchedule := obj["cron_schedule"].(string); okCronSchedule {
 		p["cron_schedule"] = valueCronSchedule
 	}
+	if valueExecutionTimeout, okExecutionTimeout := obj["execution_timeout"].(string); okExecutionTimeout {
+		p["execution_timeout"] = valueExecutionTimeout
+	}
+	if valueRunTimeout, okRunTimeout := obj["run_timeout"].(string); okRunTimeout {
+		p["run_timeout"] = valueRunTimeout
+	}
+	if valueTaskTimeout, okTaskTimeout := obj["task_timeout"].(string); okTaskTimeout {
+		p["task_timeout"] = valueTaskTimeout
+	}
 	if valueArgumentsCollection, okArguments := obj["arguments"].([]interface{}); okArguments && len(valueArgumentsCollection) > 0 {
 		if valueArguments, okArguments := valueArgumentsCollection[0].(map[string]interface{}); okArguments {
 			msg, err := protomeshpb.UnmarshalValue(valueArguments)
@@ -290,6 +299,9 @@ func MarshalTrigger(obj map[string]interface{}) (map[string]interface{}, error) 
 	p["task_queue"], _ = obj["task_queue"].(string)
 	p["id_prefix"], _ = obj["id_prefix"].(string)
 	p["cron_schedule"], _ = obj["cron_schedule"].(string)
+	p["execution_timeout"], _ = obj["execution_timeout"].(string)
+	p["run_timeout"], _ = obj["run_timeout"].(string)
+	p["task_timeout"], _ = obj["task_timeout"].(string)
 	if m, ok := obj["arguments"].(map[string]interface{}); ok {
 		d, err := protomeshpb.MarshalValue(m)
 		if err != nil {
@@ -342,12 +354,12 @@ func MarshalTriggerProto(m proto.Message) (map[string]interface{}, error) {
 func NewTriggerRetryPolicySchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"initial_interval": {
-			Type:     schema.TypeInt,
+			Type:     schema.TypeString,
 			Optional: true,
 			Default:  time.Duration(30000000000),
 		},
 		"maximum_backoff": {
-			Type:        schema.TypeInt,
+			Type:        schema.TypeString,
 			Optional:    true,
 			Description: "Maximum backoff interval between retries. Exponential backoff leads to  interval increase. This value is the cap of the interval. Default is 100x  of initial interval.",
 		},
@@ -369,6 +381,12 @@ func NewTriggerRetryPolicySchema() map[string]*schema.Schema {
 
 func UnmarshalTriggerRetryPolicy(obj map[string]interface{}) (map[string]interface{}, error) {
 	p := map[string]interface{}{}
+	if valueInitialInterval, okInitialInterval := obj["initial_interval"].(string); okInitialInterval {
+		p["initial_interval"] = valueInitialInterval
+	}
+	if valueMaximumBackoff, okMaximumBackoff := obj["maximum_backoff"].(string); okMaximumBackoff {
+		p["maximum_backoff"] = valueMaximumBackoff
+	}
 	if valueMaximumAttempts, okMaximumAttempts := obj["maximum_attempts"].(int32); okMaximumAttempts {
 		p["maximum_attempts"] = valueMaximumAttempts
 	}
@@ -400,6 +418,8 @@ func UnmarshalTriggerRetryPolicyProto(obj map[string]interface{}, m proto.Messag
 
 func MarshalTriggerRetryPolicy(obj map[string]interface{}) (map[string]interface{}, error) {
 	p := map[string]interface{}{}
+	p["initial_interval"], _ = obj["initial_interval"].(string)
+	p["maximum_backoff"], _ = obj["maximum_backoff"].(string)
 	p["maximum_attempts"], _ = obj["maximum_attempts"].(int32)
 	if l, ok := obj["non_retryable_errors"].([]interface{}); ok {
 		p["non_retryable_errors"] = []interface{}{}

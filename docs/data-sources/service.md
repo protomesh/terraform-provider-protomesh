@@ -36,7 +36,7 @@ description: |-
 
 Read-Only:
 
-- `connect_timeout` (Number)
+- `connect_timeout` (String)
 - `instance_application_protocol_options` (List of Object) (see [below for nested schema](#nestedobjatt--node--instance_application_protocol_options))
 - `service_name` (String)
 - `xds_cluster_name` (String)

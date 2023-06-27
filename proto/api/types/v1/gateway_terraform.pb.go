@@ -10,150 +10,6 @@ import (
 	"encoding/json"
 )
 
-func NewGatewayPolicySchema() map[string]*schema.Schema {
-	return map[string]*schema.Schema{
-		"handlers": {
-			Type:        schema.TypeList,
-			Optional:    true,
-			Description: "Handlers are the handlers to invoke when the source matches.  Each result of each handler is passed to the next handler.  When an error occurs, the error is returned to the client.",
-			Elem: &schema.Resource{
-				Schema: NewGatewayPolicyHandlerSchema(),
-			},
-		},
-		"source": {
-			Type:     schema.TypeList,
-			MaxItems: 1,
-			Optional: true,
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-					"http": {
-						Type:     schema.TypeList,
-						MaxItems: 1,
-						Optional: true,
-						Elem: &schema.Resource{
-							Schema: NewHttpSourceSchema(),
-						},
-					},
-					"grpc": {
-						Type:     schema.TypeList,
-						MaxItems: 1,
-						Optional: true,
-						Elem: &schema.Resource{
-							Schema: NewGrpcSourceSchema(),
-						},
-					},
-				},
-			},
-		},
-	}
-}
-
-func UnmarshalGatewayPolicy(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	if valueHandlers, okHandlers := obj["handlers"].([]interface{}); okHandlers {
-		list := valueHandlers
-		r := []map[string]interface{}{}
-		for _, val := range list {
-			m, err := UnmarshalGatewayPolicyHandler(val.(map[string]interface{}))
-			if err != nil {
-				return nil, err
-			}
-			r = append(r, m)
-		}
-		p["handlers"] = r
-	}
-	if valueSource, okSource := obj["source"].([]interface{}); okSource && len(valueSource) > 0 {
-		o := valueSource[0].(map[string]interface{})
-		if oneOfVal, ok := o["http"]; ok {
-			if valueHttpCollection, okHttp := oneOfVal.([]interface{}); okHttp && len(valueHttpCollection) > 0 {
-				if valueHttp, okHttp := valueHttpCollection[0].(map[string]interface{}); okHttp {
-					msg, err := UnmarshalHttpSource(valueHttp)
-					if err != nil {
-						return nil, err
-					}
-					p["http"] = msg
-				}
-			}
-		}
-		if oneOfVal, ok := o["grpc"]; ok {
-			if valueGrpcCollection, okGrpc := oneOfVal.([]interface{}); okGrpc && len(valueGrpcCollection) > 0 {
-				if valueGrpc, okGrpc := valueGrpcCollection[0].(map[string]interface{}); okGrpc {
-					msg, err := UnmarshalGrpcSource(valueGrpc)
-					if err != nil {
-						return nil, err
-					}
-					p["grpc"] = msg
-				}
-			}
-		}
-	}
-	return p, nil
-}
-
-func UnmarshalGatewayPolicyProto(obj map[string]interface{}, m proto.Message) error {
-	d, err := UnmarshalGatewayPolicy(obj)
-	if err != nil {
-		return err
-	}
-	b, err := json.Marshal(d)
-	if err != nil {
-		return err
-	}
-	if err := protojson.Unmarshal(b, m); err != nil {
-		return err
-	}
-	return nil
-}
-
-func MarshalGatewayPolicy(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	if l, ok := obj["handlers"].([]interface{}); ok {
-		p["handlers"] = []interface{}{}
-		for _, i := range l {
-			d, err := MarshalGatewayPolicyHandler(i.(map[string]interface{}))
-			if err != nil {
-				return nil, err
-			}
-			p["handlers"] = append(p["handlers"].([]interface{}), d)
-		}
-	}
-	p["source"] = []interface{}{}
-	if _, ok := obj["http"]; ok {
-		p["source"] = append(p["source"].([]interface{}), map[string]interface{}{})
-		if m, ok := obj["http"].(map[string]interface{}); ok {
-			d, err := MarshalHttpSource(m)
-			if err != nil {
-				return nil, err
-			}
-			p["source"].([]interface{})[0].(map[string]interface{})["http"] = []interface{}{d}
-		}
-	}
-	if _, ok := obj["grpc"]; ok {
-		p["source"] = append(p["source"].([]interface{}), map[string]interface{}{})
-		if m, ok := obj["grpc"].(map[string]interface{}); ok {
-			d, err := MarshalGrpcSource(m)
-			if err != nil {
-				return nil, err
-			}
-			p["source"].([]interface{})[0].(map[string]interface{})["grpc"] = []interface{}{d}
-		}
-	}
-	return p, nil
-}
-
-func MarshalGatewayPolicyProto(m proto.Message) (map[string]interface{}, error) {
-	obj := map[string]interface{}{}
-	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(b, &obj)
-	if err != nil {
-		return nil, err
-	}
-	return MarshalGatewayPolicy(obj)
-}
-
 func NewGatewayPolicyHandlerSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"handler": {
@@ -516,4 +372,148 @@ func MarshalAwsHandlerLambdaFunctionProto(m proto.Message) (map[string]interface
 		return nil, err
 	}
 	return MarshalAwsHandlerLambdaFunction(obj)
+}
+
+func NewGatewayPolicySchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		"handlers": {
+			Type:        schema.TypeList,
+			Optional:    true,
+			Description: "Handlers are the handlers to invoke when the source matches.  Each result of each handler is passed to the next handler.  When an error occurs, the error is returned to the client.",
+			Elem: &schema.Resource{
+				Schema: NewGatewayPolicyHandlerSchema(),
+			},
+		},
+		"source": {
+			Type:     schema.TypeList,
+			MaxItems: 1,
+			Optional: true,
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"http": {
+						Type:     schema.TypeList,
+						MaxItems: 1,
+						Optional: true,
+						Elem: &schema.Resource{
+							Schema: NewHttpSourceSchema(),
+						},
+					},
+					"grpc": {
+						Type:     schema.TypeList,
+						MaxItems: 1,
+						Optional: true,
+						Elem: &schema.Resource{
+							Schema: NewGrpcSourceSchema(),
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func UnmarshalGatewayPolicy(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	if valueHandlers, okHandlers := obj["handlers"].([]interface{}); okHandlers {
+		list := valueHandlers
+		r := []map[string]interface{}{}
+		for _, val := range list {
+			m, err := UnmarshalGatewayPolicyHandler(val.(map[string]interface{}))
+			if err != nil {
+				return nil, err
+			}
+			r = append(r, m)
+		}
+		p["handlers"] = r
+	}
+	if valueSource, okSource := obj["source"].([]interface{}); okSource && len(valueSource) > 0 {
+		o := valueSource[0].(map[string]interface{})
+		if oneOfVal, ok := o["http"]; ok {
+			if valueHttpCollection, okHttp := oneOfVal.([]interface{}); okHttp && len(valueHttpCollection) > 0 {
+				if valueHttp, okHttp := valueHttpCollection[0].(map[string]interface{}); okHttp {
+					msg, err := UnmarshalHttpSource(valueHttp)
+					if err != nil {
+						return nil, err
+					}
+					p["http"] = msg
+				}
+			}
+		}
+		if oneOfVal, ok := o["grpc"]; ok {
+			if valueGrpcCollection, okGrpc := oneOfVal.([]interface{}); okGrpc && len(valueGrpcCollection) > 0 {
+				if valueGrpc, okGrpc := valueGrpcCollection[0].(map[string]interface{}); okGrpc {
+					msg, err := UnmarshalGrpcSource(valueGrpc)
+					if err != nil {
+						return nil, err
+					}
+					p["grpc"] = msg
+				}
+			}
+		}
+	}
+	return p, nil
+}
+
+func UnmarshalGatewayPolicyProto(obj map[string]interface{}, m proto.Message) error {
+	d, err := UnmarshalGatewayPolicy(obj)
+	if err != nil {
+		return err
+	}
+	b, err := json.Marshal(d)
+	if err != nil {
+		return err
+	}
+	if err := protojson.Unmarshal(b, m); err != nil {
+		return err
+	}
+	return nil
+}
+
+func MarshalGatewayPolicy(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	if l, ok := obj["handlers"].([]interface{}); ok {
+		p["handlers"] = []interface{}{}
+		for _, i := range l {
+			d, err := MarshalGatewayPolicyHandler(i.(map[string]interface{}))
+			if err != nil {
+				return nil, err
+			}
+			p["handlers"] = append(p["handlers"].([]interface{}), d)
+		}
+	}
+	p["source"] = []interface{}{}
+	if _, ok := obj["http"]; ok {
+		p["source"] = append(p["source"].([]interface{}), map[string]interface{}{})
+		if m, ok := obj["http"].(map[string]interface{}); ok {
+			d, err := MarshalHttpSource(m)
+			if err != nil {
+				return nil, err
+			}
+			p["source"].([]interface{})[0].(map[string]interface{})["http"] = []interface{}{d}
+		}
+	}
+	if _, ok := obj["grpc"]; ok {
+		p["source"] = append(p["source"].([]interface{}), map[string]interface{}{})
+		if m, ok := obj["grpc"].(map[string]interface{}); ok {
+			d, err := MarshalGrpcSource(m)
+			if err != nil {
+				return nil, err
+			}
+			p["source"].([]interface{})[0].(map[string]interface{})["grpc"] = []interface{}{d}
+		}
+	}
+	return p, nil
+}
+
+func MarshalGatewayPolicyProto(m proto.Message) (map[string]interface{}, error) {
+	obj := map[string]interface{}{}
+	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(b, &obj)
+	if err != nil {
+		return nil, err
+	}
+	return MarshalGatewayPolicy(obj)
 }

@@ -38,16 +38,16 @@ Read-Only:
 
 - `arguments` (List of Object) (see [below for nested schema](#nestedobjatt--process--arguments))
 - `cron_schedule` (String)
-- `execution_timeout` (Number)
+- `execution_timeout` (String)
 - `id_prefix` (String)
 - `id_suffix` (List of Object) (see [below for nested schema](#nestedobjatt--process--id_suffix))
 - `if_running` (List of Object) (see [below for nested schema](#nestedobjatt--process--if_running))
 - `name` (String)
 - `on_drop` (List of Object) (see [below for nested schema](#nestedobjatt--process--on_drop))
 - `retry_policy` (List of Object) (see [below for nested schema](#nestedobjatt--process--retry_policy))
-- `run_timeout` (Number)
+- `run_timeout` (String)
 - `task_queue` (String)
-- `task_timeout` (Number)
+- `task_timeout` (String)
 
 <a id="nestedobjatt--process--arguments"></a>
 ### Nested Schema for `process.arguments`
@@ -87,9 +87,9 @@ Read-Only:
 
 Read-Only:
 
-- `initial_interval` (Number)
+- `initial_interval` (String)
 - `maximum_attempts` (Number)
-- `maximum_backoff` (Number)
+- `maximum_backoff` (String)
 - `non_retryable_errors` (List of String)
 
 

@@ -51,7 +51,7 @@ Read-Only:
 - `allow_methods` (List of String)
 - `allow_origin_string_match_prefix` (List of String)
 - `expose_headers` (List of String)
-- `max_age` (Number)
+- `max_age` (String)
 
 
 <a id="nestedobjatt--node--routes"></a>
@@ -61,6 +61,6 @@ Read-Only:
 
 - `match_prefix` (String)
 - `target_service` (String)
-- `timeout` (Number)
+- `timeout` (String)
 
 
