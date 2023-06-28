@@ -10,6 +10,92 @@ import (
 	"encoding/json"
 )
 
+func NewAwsHandlerSchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		"handler": {
+			Type:     schema.TypeList,
+			MaxItems: 1,
+			Optional: true,
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"lambda": {
+						Type:        schema.TypeList,
+						MaxItems:    1,
+						Optional:    true,
+						Description: "Lambda function handler.",
+						Elem: &schema.Resource{
+							Schema: NewAwsHandlerLambdaFunctionSchema(),
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func UnmarshalAwsHandler(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	if valueHandler, okHandler := obj["handler"].([]interface{}); okHandler && len(valueHandler) > 0 {
+		o := valueHandler[0].(map[string]interface{})
+		if oneOfVal, ok := o["lambda"]; ok {
+			if valueLambdaCollection, okLambda := oneOfVal.([]interface{}); okLambda && len(valueLambdaCollection) > 0 {
+				if valueLambda, okLambda := valueLambdaCollection[0].(map[string]interface{}); okLambda {
+					msg, err := UnmarshalAwsHandlerLambdaFunction(valueLambda)
+					if err != nil {
+						return nil, err
+					}
+					p["lambda"] = msg
+				}
+			}
+		}
+	}
+	return p, nil
+}
+
+func UnmarshalAwsHandlerProto(obj map[string]interface{}, m proto.Message) error {
+	d, err := UnmarshalAwsHandler(obj)
+	if err != nil {
+		return err
+	}
+	b, err := json.Marshal(d)
+	if err != nil {
+		return err
+	}
+	if err := protojson.Unmarshal(b, m); err != nil {
+		return err
+	}
+	return nil
+}
+
+func MarshalAwsHandler(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	p["handler"] = []interface{}{}
+	if _, ok := obj["lambda"]; ok {
+		p["handler"] = append(p["handler"].([]interface{}), map[string]interface{}{})
+		if m, ok := obj["lambda"].(map[string]interface{}); ok {
+			d, err := MarshalAwsHandlerLambdaFunction(m)
+			if err != nil {
+				return nil, err
+			}
+			p["handler"].([]interface{})[0].(map[string]interface{})["lambda"] = []interface{}{d}
+		}
+	}
+	return p, nil
+}
+
+func MarshalAwsHandlerProto(m proto.Message) (map[string]interface{}, error) {
+	obj := map[string]interface{}{}
+	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(b, &obj)
+	if err != nil {
+		return nil, err
+	}
+	return MarshalAwsHandler(obj)
+}
+
 func NewAwsHandlerLambdaFunctionSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"function_name": {
@@ -430,90 +516,4 @@ func MarshalGrpcSourceProto(m proto.Message) (map[string]interface{}, error) {
 		return nil, err
 	}
 	return MarshalGrpcSource(obj)
-}
-
-func NewAwsHandlerSchema() map[string]*schema.Schema {
-	return map[string]*schema.Schema{
-		"handler": {
-			Type:     schema.TypeList,
-			MaxItems: 1,
-			Optional: true,
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-					"lambda": {
-						Type:        schema.TypeList,
-						MaxItems:    1,
-						Optional:    true,
-						Description: "Lambda function handler.",
-						Elem: &schema.Resource{
-							Schema: NewAwsHandlerLambdaFunctionSchema(),
-						},
-					},
-				},
-			},
-		},
-	}
-}
-
-func UnmarshalAwsHandler(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	if valueHandler, okHandler := obj["handler"].([]interface{}); okHandler && len(valueHandler) > 0 {
-		o := valueHandler[0].(map[string]interface{})
-		if oneOfVal, ok := o["lambda"]; ok {
-			if valueLambdaCollection, okLambda := oneOfVal.([]interface{}); okLambda && len(valueLambdaCollection) > 0 {
-				if valueLambda, okLambda := valueLambdaCollection[0].(map[string]interface{}); okLambda {
-					msg, err := UnmarshalAwsHandlerLambdaFunction(valueLambda)
-					if err != nil {
-						return nil, err
-					}
-					p["lambda"] = msg
-				}
-			}
-		}
-	}
-	return p, nil
-}
-
-func UnmarshalAwsHandlerProto(obj map[string]interface{}, m proto.Message) error {
-	d, err := UnmarshalAwsHandler(obj)
-	if err != nil {
-		return err
-	}
-	b, err := json.Marshal(d)
-	if err != nil {
-		return err
-	}
-	if err := protojson.Unmarshal(b, m); err != nil {
-		return err
-	}
-	return nil
-}
-
-func MarshalAwsHandler(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	p["handler"] = []interface{}{}
-	if _, ok := obj["lambda"]; ok {
-		p["handler"] = append(p["handler"].([]interface{}), map[string]interface{}{})
-		if m, ok := obj["lambda"].(map[string]interface{}); ok {
-			d, err := MarshalAwsHandlerLambdaFunction(m)
-			if err != nil {
-				return nil, err
-			}
-			p["handler"].([]interface{})[0].(map[string]interface{})["lambda"] = []interface{}{d}
-		}
-	}
-	return p, nil
-}
-
-func MarshalAwsHandlerProto(m proto.Message) (map[string]interface{}, error) {
-	obj := map[string]interface{}{}
-	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(b, &obj)
-	if err != nil {
-		return nil, err
-	}
-	return MarshalAwsHandler(obj)
 }
