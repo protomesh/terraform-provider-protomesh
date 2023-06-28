@@ -58,9 +58,17 @@ Optional:
 <a id="nestedblock--node--http_filters--filter--cors"></a>
 ### Nested Schema for `node.http_filters.filter.cors`
 
+Required:
+
+- `enable` (Boolean) Enable the cors filter.
+
 
 <a id="nestedblock--node--http_filters--filter--grpc_web"></a>
 ### Nested Schema for `node.http_filters.filter.grpc_web`
+
+Required:
+
+- `enable` (Boolean) Enable the grpc-web filter.
 
 
 <a id="nestedblock--node--http_filters--filter--health_check"></a>

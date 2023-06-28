@@ -63,6 +63,7 @@ Read-Only:
 
 Read-Only:
 
+- `enable` (Boolean)
 
 
 <a id="nestedobjatt--node--http_filters--filter--grpc_web"></a>
@@ -70,6 +71,7 @@ Read-Only:
 
 Read-Only:
 
+- `enable` (Boolean)
 
 
 <a id="nestedobjatt--node--http_filters--filter--health_check"></a>

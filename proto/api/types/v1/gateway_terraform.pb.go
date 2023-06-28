@@ -10,91 +10,6 @@ import (
 	"encoding/json"
 )
 
-func NewGatewayPolicyHandlerSchema() map[string]*schema.Schema {
-	return map[string]*schema.Schema{
-		"handler": {
-			Type:     schema.TypeList,
-			MaxItems: 1,
-			Optional: true,
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-					"aws": {
-						Type:     schema.TypeList,
-						MaxItems: 1,
-						Optional: true,
-						Elem: &schema.Resource{
-							Schema: NewAwsHandlerSchema(),
-						},
-					},
-				},
-			},
-		},
-	}
-}
-
-func UnmarshalGatewayPolicyHandler(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	if valueHandler, okHandler := obj["handler"].([]interface{}); okHandler && len(valueHandler) > 0 {
-		o := valueHandler[0].(map[string]interface{})
-		if oneOfVal, ok := o["aws"]; ok {
-			if valueAwsCollection, okAws := oneOfVal.([]interface{}); okAws && len(valueAwsCollection) > 0 {
-				if valueAws, okAws := valueAwsCollection[0].(map[string]interface{}); okAws {
-					msg, err := UnmarshalAwsHandler(valueAws)
-					if err != nil {
-						return nil, err
-					}
-					p["aws"] = msg
-				}
-			}
-		}
-	}
-	return p, nil
-}
-
-func UnmarshalGatewayPolicyHandlerProto(obj map[string]interface{}, m proto.Message) error {
-	d, err := UnmarshalGatewayPolicyHandler(obj)
-	if err != nil {
-		return err
-	}
-	b, err := json.Marshal(d)
-	if err != nil {
-		return err
-	}
-	if err := protojson.Unmarshal(b, m); err != nil {
-		return err
-	}
-	return nil
-}
-
-func MarshalGatewayPolicyHandler(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	p["handler"] = []interface{}{}
-	if _, ok := obj["aws"]; ok {
-		p["handler"] = append(p["handler"].([]interface{}), map[string]interface{}{})
-		if m, ok := obj["aws"].(map[string]interface{}); ok {
-			d, err := MarshalAwsHandler(m)
-			if err != nil {
-				return nil, err
-			}
-			p["handler"].([]interface{})[0].(map[string]interface{})["aws"] = []interface{}{d}
-		}
-	}
-	return p, nil
-}
-
-func MarshalGatewayPolicyHandlerProto(m proto.Message) (map[string]interface{}, error) {
-	obj := map[string]interface{}{}
-	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(b, &obj)
-	if err != nil {
-		return nil, err
-	}
-	return MarshalGatewayPolicyHandler(obj)
-}
-
 func NewHttpSourceSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"method": {
@@ -516,4 +431,89 @@ func MarshalGatewayPolicyProto(m proto.Message) (map[string]interface{}, error) 
 		return nil, err
 	}
 	return MarshalGatewayPolicy(obj)
+}
+
+func NewGatewayPolicyHandlerSchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		"handler": {
+			Type:     schema.TypeList,
+			MaxItems: 1,
+			Optional: true,
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"aws": {
+						Type:     schema.TypeList,
+						MaxItems: 1,
+						Optional: true,
+						Elem: &schema.Resource{
+							Schema: NewAwsHandlerSchema(),
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func UnmarshalGatewayPolicyHandler(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	if valueHandler, okHandler := obj["handler"].([]interface{}); okHandler && len(valueHandler) > 0 {
+		o := valueHandler[0].(map[string]interface{})
+		if oneOfVal, ok := o["aws"]; ok {
+			if valueAwsCollection, okAws := oneOfVal.([]interface{}); okAws && len(valueAwsCollection) > 0 {
+				if valueAws, okAws := valueAwsCollection[0].(map[string]interface{}); okAws {
+					msg, err := UnmarshalAwsHandler(valueAws)
+					if err != nil {
+						return nil, err
+					}
+					p["aws"] = msg
+				}
+			}
+		}
+	}
+	return p, nil
+}
+
+func UnmarshalGatewayPolicyHandlerProto(obj map[string]interface{}, m proto.Message) error {
+	d, err := UnmarshalGatewayPolicyHandler(obj)
+	if err != nil {
+		return err
+	}
+	b, err := json.Marshal(d)
+	if err != nil {
+		return err
+	}
+	if err := protojson.Unmarshal(b, m); err != nil {
+		return err
+	}
+	return nil
+}
+
+func MarshalGatewayPolicyHandler(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	p["handler"] = []interface{}{}
+	if _, ok := obj["aws"]; ok {
+		p["handler"] = append(p["handler"].([]interface{}), map[string]interface{}{})
+		if m, ok := obj["aws"].(map[string]interface{}); ok {
+			d, err := MarshalAwsHandler(m)
+			if err != nil {
+				return nil, err
+			}
+			p["handler"].([]interface{})[0].(map[string]interface{})["aws"] = []interface{}{d}
+		}
+	}
+	return p, nil
+}
+
+func MarshalGatewayPolicyHandlerProto(m proto.Message) (map[string]interface{}, error) {
+	obj := map[string]interface{}{}
+	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(b, &obj)
+	if err != nil {
+		return nil, err
+	}
+	return MarshalGatewayPolicyHandler(obj)
 }
