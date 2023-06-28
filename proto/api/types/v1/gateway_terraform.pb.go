@@ -10,224 +10,6 @@ import (
 	"encoding/json"
 )
 
-func NewHttpSourceSchema() map[string]*schema.Schema {
-	return map[string]*schema.Schema{
-		"method": {
-			Type:         schema.TypeString,
-			ValidateFunc: validation.StringInSlice([]string{"HTTP_METHOD_UNDEFINED", "HTTP_METHOD_GET", "HTTP_METHOD_HEAD", "HTTP_METHOD_POST", "HTTP_METHOD_PUT", "HTTP_METHOD_DELETE", "HTTP_METHOD_CONNECT", "HTTP_METHOD_OPTIONS", "HTTP_METHOD_TRACE", "HTTP_METHOD_PATCH"}, false),
-			Optional:     true,
-			Description:  "HTTP method to match against the URL.  If you speicify HTT_METHOD_UNDEFINED, the method is not considered when  matching.",
-		},
-		"path": {
-			Type:        schema.TypeString,
-			Optional:    true,
-			Description: "Path to match against the URL.",
-		},
-		"exact_path_match": {
-			Type:        schema.TypeBool,
-			Optional:    true,
-			Description: "If true, the path must match exactly.  Otherwise, the path must match using the prefix match semantics (Radix Tree match longest operation).",
-		},
-	}
-}
-
-func UnmarshalHttpSource(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	if valueMethod, okMethod := obj["method"].(string); okMethod {
-		p["method"] = valueMethod
-	}
-	if valuePath, okPath := obj["path"].(string); okPath {
-		p["path"] = valuePath
-	}
-	if valueExactPathMatch, okExactPathMatch := obj["exact_path_match"].(bool); okExactPathMatch {
-		p["exact_path_match"] = valueExactPathMatch
-	}
-	return p, nil
-}
-
-func UnmarshalHttpSourceProto(obj map[string]interface{}, m proto.Message) error {
-	d, err := UnmarshalHttpSource(obj)
-	if err != nil {
-		return err
-	}
-	b, err := json.Marshal(d)
-	if err != nil {
-		return err
-	}
-	if err := protojson.Unmarshal(b, m); err != nil {
-		return err
-	}
-	return nil
-}
-
-func MarshalHttpSource(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	p["method"], _ = obj["method"].(string)
-	p["path"], _ = obj["path"].(string)
-	p["exact_path_match"], _ = obj["exact_path_match"].(bool)
-	return p, nil
-}
-
-func MarshalHttpSourceProto(m proto.Message) (map[string]interface{}, error) {
-	obj := map[string]interface{}{}
-	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(b, &obj)
-	if err != nil {
-		return nil, err
-	}
-	return MarshalHttpSource(obj)
-}
-
-func NewGrpcSourceSchema() map[string]*schema.Schema {
-	return map[string]*schema.Schema{
-		"method_name": {
-			Type:        schema.TypeString,
-			Optional:    true,
-			Description: "Full method name of the gRPC method (/my.package.GrpcService/GrpcMethod).",
-		},
-		"exact_method_name_match": {
-			Type:        schema.TypeBool,
-			Optional:    true,
-			Description: "If true, the method name must match exactly.  Otherwise, the method name must match using the prefix match semantics (Radix Tree match longest operation).",
-		},
-	}
-}
-
-func UnmarshalGrpcSource(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	if valueMethodName, okMethodName := obj["method_name"].(string); okMethodName {
-		p["method_name"] = valueMethodName
-	}
-	if valueExactMethodNameMatch, okExactMethodNameMatch := obj["exact_method_name_match"].(bool); okExactMethodNameMatch {
-		p["exact_method_name_match"] = valueExactMethodNameMatch
-	}
-	return p, nil
-}
-
-func UnmarshalGrpcSourceProto(obj map[string]interface{}, m proto.Message) error {
-	d, err := UnmarshalGrpcSource(obj)
-	if err != nil {
-		return err
-	}
-	b, err := json.Marshal(d)
-	if err != nil {
-		return err
-	}
-	if err := protojson.Unmarshal(b, m); err != nil {
-		return err
-	}
-	return nil
-}
-
-func MarshalGrpcSource(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	p["method_name"], _ = obj["method_name"].(string)
-	p["exact_method_name_match"], _ = obj["exact_method_name_match"].(bool)
-	return p, nil
-}
-
-func MarshalGrpcSourceProto(m proto.Message) (map[string]interface{}, error) {
-	obj := map[string]interface{}{}
-	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(b, &obj)
-	if err != nil {
-		return nil, err
-	}
-	return MarshalGrpcSource(obj)
-}
-
-func NewAwsHandlerSchema() map[string]*schema.Schema {
-	return map[string]*schema.Schema{
-		"handler": {
-			Type:     schema.TypeList,
-			MaxItems: 1,
-			Optional: true,
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-					"lambda": {
-						Type:        schema.TypeList,
-						MaxItems:    1,
-						Optional:    true,
-						Description: "Lambda function handler.",
-						Elem: &schema.Resource{
-							Schema: NewAwsHandlerLambdaFunctionSchema(),
-						},
-					},
-				},
-			},
-		},
-	}
-}
-
-func UnmarshalAwsHandler(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	if valueHandler, okHandler := obj["handler"].([]interface{}); okHandler && len(valueHandler) > 0 {
-		o := valueHandler[0].(map[string]interface{})
-		if oneOfVal, ok := o["lambda"]; ok {
-			if valueLambdaCollection, okLambda := oneOfVal.([]interface{}); okLambda && len(valueLambdaCollection) > 0 {
-				if valueLambda, okLambda := valueLambdaCollection[0].(map[string]interface{}); okLambda {
-					msg, err := UnmarshalAwsHandlerLambdaFunction(valueLambda)
-					if err != nil {
-						return nil, err
-					}
-					p["lambda"] = msg
-				}
-			}
-		}
-	}
-	return p, nil
-}
-
-func UnmarshalAwsHandlerProto(obj map[string]interface{}, m proto.Message) error {
-	d, err := UnmarshalAwsHandler(obj)
-	if err != nil {
-		return err
-	}
-	b, err := json.Marshal(d)
-	if err != nil {
-		return err
-	}
-	if err := protojson.Unmarshal(b, m); err != nil {
-		return err
-	}
-	return nil
-}
-
-func MarshalAwsHandler(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	p["handler"] = []interface{}{}
-	if _, ok := obj["lambda"]; ok {
-		p["handler"] = append(p["handler"].([]interface{}), map[string]interface{}{})
-		if m, ok := obj["lambda"].(map[string]interface{}); ok {
-			d, err := MarshalAwsHandlerLambdaFunction(m)
-			if err != nil {
-				return nil, err
-			}
-			p["handler"].([]interface{})[0].(map[string]interface{})["lambda"] = []interface{}{d}
-		}
-	}
-	return p, nil
-}
-
-func MarshalAwsHandlerProto(m proto.Message) (map[string]interface{}, error) {
-	obj := map[string]interface{}{}
-	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(b, &obj)
-	if err != nil {
-		return nil, err
-	}
-	return MarshalAwsHandler(obj)
-}
-
 func NewAwsHandlerLambdaFunctionSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"function_name": {
@@ -516,4 +298,222 @@ func MarshalGatewayPolicyHandlerProto(m proto.Message) (map[string]interface{}, 
 		return nil, err
 	}
 	return MarshalGatewayPolicyHandler(obj)
+}
+
+func NewHttpSourceSchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		"method": {
+			Type:         schema.TypeString,
+			ValidateFunc: validation.StringInSlice([]string{"HTTP_METHOD_UNDEFINED", "HTTP_METHOD_GET", "HTTP_METHOD_HEAD", "HTTP_METHOD_POST", "HTTP_METHOD_PUT", "HTTP_METHOD_DELETE", "HTTP_METHOD_CONNECT", "HTTP_METHOD_OPTIONS", "HTTP_METHOD_TRACE", "HTTP_METHOD_PATCH"}, false),
+			Optional:     true,
+			Description:  "HTTP method to match against the URL.  If you speicify HTT_METHOD_UNDEFINED, the method is not considered when  matching.",
+		},
+		"path": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "Path to match against the URL.",
+		},
+		"exact_path_match": {
+			Type:        schema.TypeBool,
+			Optional:    true,
+			Description: "If true, the path must match exactly.  Otherwise, the path must match using the prefix match semantics (Radix Tree match longest operation).",
+		},
+	}
+}
+
+func UnmarshalHttpSource(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	if valueMethod, okMethod := obj["method"].(string); okMethod {
+		p["method"] = valueMethod
+	}
+	if valuePath, okPath := obj["path"].(string); okPath {
+		p["path"] = valuePath
+	}
+	if valueExactPathMatch, okExactPathMatch := obj["exact_path_match"].(bool); okExactPathMatch {
+		p["exact_path_match"] = valueExactPathMatch
+	}
+	return p, nil
+}
+
+func UnmarshalHttpSourceProto(obj map[string]interface{}, m proto.Message) error {
+	d, err := UnmarshalHttpSource(obj)
+	if err != nil {
+		return err
+	}
+	b, err := json.Marshal(d)
+	if err != nil {
+		return err
+	}
+	if err := protojson.Unmarshal(b, m); err != nil {
+		return err
+	}
+	return nil
+}
+
+func MarshalHttpSource(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	p["method"], _ = obj["method"].(string)
+	p["path"], _ = obj["path"].(string)
+	p["exact_path_match"], _ = obj["exact_path_match"].(bool)
+	return p, nil
+}
+
+func MarshalHttpSourceProto(m proto.Message) (map[string]interface{}, error) {
+	obj := map[string]interface{}{}
+	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(b, &obj)
+	if err != nil {
+		return nil, err
+	}
+	return MarshalHttpSource(obj)
+}
+
+func NewGrpcSourceSchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		"method_name": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "Full method name of the gRPC method (/my.package.GrpcService/GrpcMethod).",
+		},
+		"exact_method_name_match": {
+			Type:        schema.TypeBool,
+			Optional:    true,
+			Description: "If true, the method name must match exactly.  Otherwise, the method name must match using the prefix match semantics (Radix Tree match longest operation).",
+		},
+	}
+}
+
+func UnmarshalGrpcSource(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	if valueMethodName, okMethodName := obj["method_name"].(string); okMethodName {
+		p["method_name"] = valueMethodName
+	}
+	if valueExactMethodNameMatch, okExactMethodNameMatch := obj["exact_method_name_match"].(bool); okExactMethodNameMatch {
+		p["exact_method_name_match"] = valueExactMethodNameMatch
+	}
+	return p, nil
+}
+
+func UnmarshalGrpcSourceProto(obj map[string]interface{}, m proto.Message) error {
+	d, err := UnmarshalGrpcSource(obj)
+	if err != nil {
+		return err
+	}
+	b, err := json.Marshal(d)
+	if err != nil {
+		return err
+	}
+	if err := protojson.Unmarshal(b, m); err != nil {
+		return err
+	}
+	return nil
+}
+
+func MarshalGrpcSource(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	p["method_name"], _ = obj["method_name"].(string)
+	p["exact_method_name_match"], _ = obj["exact_method_name_match"].(bool)
+	return p, nil
+}
+
+func MarshalGrpcSourceProto(m proto.Message) (map[string]interface{}, error) {
+	obj := map[string]interface{}{}
+	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(b, &obj)
+	if err != nil {
+		return nil, err
+	}
+	return MarshalGrpcSource(obj)
+}
+
+func NewAwsHandlerSchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		"handler": {
+			Type:     schema.TypeList,
+			MaxItems: 1,
+			Optional: true,
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"lambda": {
+						Type:        schema.TypeList,
+						MaxItems:    1,
+						Optional:    true,
+						Description: "Lambda function handler.",
+						Elem: &schema.Resource{
+							Schema: NewAwsHandlerLambdaFunctionSchema(),
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func UnmarshalAwsHandler(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	if valueHandler, okHandler := obj["handler"].([]interface{}); okHandler && len(valueHandler) > 0 {
+		o := valueHandler[0].(map[string]interface{})
+		if oneOfVal, ok := o["lambda"]; ok {
+			if valueLambdaCollection, okLambda := oneOfVal.([]interface{}); okLambda && len(valueLambdaCollection) > 0 {
+				if valueLambda, okLambda := valueLambdaCollection[0].(map[string]interface{}); okLambda {
+					msg, err := UnmarshalAwsHandlerLambdaFunction(valueLambda)
+					if err != nil {
+						return nil, err
+					}
+					p["lambda"] = msg
+				}
+			}
+		}
+	}
+	return p, nil
+}
+
+func UnmarshalAwsHandlerProto(obj map[string]interface{}, m proto.Message) error {
+	d, err := UnmarshalAwsHandler(obj)
+	if err != nil {
+		return err
+	}
+	b, err := json.Marshal(d)
+	if err != nil {
+		return err
+	}
+	if err := protojson.Unmarshal(b, m); err != nil {
+		return err
+	}
+	return nil
+}
+
+func MarshalAwsHandler(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	p["handler"] = []interface{}{}
+	if _, ok := obj["lambda"]; ok {
+		p["handler"] = append(p["handler"].([]interface{}), map[string]interface{}{})
+		if m, ok := obj["lambda"].(map[string]interface{}); ok {
+			d, err := MarshalAwsHandlerLambdaFunction(m)
+			if err != nil {
+				return nil, err
+			}
+			p["handler"].([]interface{})[0].(map[string]interface{})["lambda"] = []interface{}{d}
+		}
+	}
+	return p, nil
+}
+
+func MarshalAwsHandlerProto(m proto.Message) (map[string]interface{}, error) {
+	obj := map[string]interface{}{}
+	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(b, &obj)
+	if err != nil {
+		return nil, err
+	}
+	return MarshalAwsHandler(obj)
 }

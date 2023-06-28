@@ -387,7 +387,7 @@ func UnmarshalTriggerRetryPolicy(obj map[string]interface{}) (map[string]interfa
 	if valueMaximumBackoff, okMaximumBackoff := obj["maximum_backoff"].(string); okMaximumBackoff {
 		p["maximum_backoff"] = valueMaximumBackoff
 	}
-	if valueMaximumAttempts, okMaximumAttempts := obj["maximum_attempts"].(int32); okMaximumAttempts {
+	if valueMaximumAttempts, okMaximumAttempts := obj["maximum_attempts"].(int); okMaximumAttempts {
 		p["maximum_attempts"] = valueMaximumAttempts
 	}
 	if valueNonRetryableErrors, okNonRetryableErrors := obj["non_retryable_errors"].([]interface{}); okNonRetryableErrors {
@@ -420,7 +420,7 @@ func MarshalTriggerRetryPolicy(obj map[string]interface{}) (map[string]interface
 	p := map[string]interface{}{}
 	p["initial_interval"], _ = obj["initial_interval"].(string)
 	p["maximum_backoff"], _ = obj["maximum_backoff"].(string)
-	p["maximum_attempts"], _ = obj["maximum_attempts"].(int32)
+	p["maximum_attempts"], _ = obj["maximum_attempts"].(int)
 	if l, ok := obj["non_retryable_errors"].([]interface{}); ok {
 		p["non_retryable_errors"] = []interface{}{}
 		for _, i := range l {
