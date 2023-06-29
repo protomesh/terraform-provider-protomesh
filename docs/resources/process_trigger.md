@@ -37,25 +37,17 @@ Required:
 
 Optional:
 
-- `arguments` (Block List, Max: 1) A list of arguments to pass to workflow. (see [below for nested schema](#nestedblock--process--arguments))
 - `cron_schedule` (String) Optional cron schedule for workflow. If a cron schedule is specified, the  workflow will run as a cron based on the schedule. The scheduling will be  based on UTC time. Schedule for next run only happen after the current run  is completed/failed/timeout. If a RetryPolicy is also supplied, and the  workflow failed or timeout, the workflow will be retried based on the retry  policy. While the workflow is retrying, it won't schedule its next run. If  next schedule is due while workflow is running (or retrying), then it will  skip that schedule. Cron workflow will not stop until it is terminated or  canceled (by returning temporal.CanceledError). The cron spec is as  following: ┌───────────── minute (0 - 59) │ ┌───────────── hour (0 - 23) │  │ ┌───────────── day of the month (1 - 31) │ │ │ ┌───────────── month (1 -  12) │ │ │ │ ┌───────────── day of the week (0 - 6) (Sunday to Saturday) │ │  │ │ │ │ │ │ │ │  * * * * *
 - `execution_timeout` (String) The end to end timeout for the child workflow execution including retries  and continue as new.  Optional: defaults to unlimited.
 - `id_prefix` (String) Static ID prefix.
 - `id_suffix` (Block List, Max: 1) (see [below for nested schema](#nestedblock--process--id_suffix))
 - `if_running` (Block List, Max: 1) (see [below for nested schema](#nestedblock--process--if_running))
+- `json_arguments` (String) Arguments to pass to the workflow.
 - `on_drop` (Block List, Max: 1) (see [below for nested schema](#nestedblock--process--on_drop))
 - `retry_policy` (Block List, Max: 1) RetryPolicy specify how to retry child workflow if error happens.  Optional: default is no retry (see [below for nested schema](#nestedblock--process--retry_policy))
 - `run_timeout` (String) The timeout for a single run of the child workflow execution. Each retry or  continue as new should obey this timeout. Use WorkflowExecutionTimeout to  specify how long the parent is willing to wait for the child completion.  Optional: defaults to WorkflowExecutionTimeout
 - `task_queue` (String) Task queue on temporal to send workflow tasks.
 - `task_timeout` (String) Maximum execution time of a single Workflow Task. In the majority of cases  there is no need to change this timeout. Note that this timeout is not  related to the overall Workflow duration in any way. It defines for how  long the Workflow can get blocked in the case of a Workflow Worker crash.  Default is 10 seconds. Maximum value allowed by the Temporal Server is 1  minute.
-
-<a id="nestedblock--process--arguments"></a>
-### Nested Schema for `process.arguments`
-
-Optional:
-
-- `value` (String) Any valid JSON value, as number, boolean, null, quoted string, array or struct. See https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/struct.proto for more information.
-
 
 <a id="nestedblock--process--id_suffix"></a>
 ### Nested Schema for `process.id_suffix`

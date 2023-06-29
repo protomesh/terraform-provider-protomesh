@@ -7,10 +7,10 @@ require (
 	github.com/hashicorp/terraform-plugin-log v0.9.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.26.1
 	github.com/protomesh/go-app v0.2.0
-	github.com/protomesh/protoc-gen-terraform v0.0.0-20230613213824-8b67d9b8077d
+	github.com/protomesh/protoc-gen-terraform v0.0.0-20230629105817-0b6981fc8a88
 	github.com/protomesh/protomesh v0.1.2-0.20230618185350-e11e72c27274
 	google.golang.org/grpc v1.55.0
-	google.golang.org/protobuf v1.30.0
+	google.golang.org/protobuf v1.31.0
 )
 
 require (

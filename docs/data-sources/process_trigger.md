@@ -36,26 +36,18 @@ description: |-
 
 Read-Only:
 
-- `arguments` (List of Object) (see [below for nested schema](#nestedobjatt--process--arguments))
 - `cron_schedule` (String)
 - `execution_timeout` (String)
 - `id_prefix` (String)
 - `id_suffix` (List of Object) (see [below for nested schema](#nestedobjatt--process--id_suffix))
 - `if_running` (List of Object) (see [below for nested schema](#nestedobjatt--process--if_running))
+- `json_arguments` (String)
 - `name` (String)
 - `on_drop` (List of Object) (see [below for nested schema](#nestedobjatt--process--on_drop))
 - `retry_policy` (List of Object) (see [below for nested schema](#nestedobjatt--process--retry_policy))
 - `run_timeout` (String)
 - `task_queue` (String)
 - `task_timeout` (String)
-
-<a id="nestedobjatt--process--arguments"></a>
-### Nested Schema for `process.arguments`
-
-Read-Only:
-
-- `value` (String)
-
 
 <a id="nestedobjatt--process--id_suffix"></a>
 ### Nested Schema for `process.id_suffix`

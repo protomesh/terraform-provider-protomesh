@@ -9,8 +9,103 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 	"encoding/json"
-	protomeshpb "github.com/protomesh/protoc-gen-terraform/pkg/protobuf"
+	"reflect"
 )
+
+func NewTriggerRetryPolicySchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		"initial_interval": {
+			Type:     schema.TypeString,
+			Optional: true,
+			Default:  time.Duration(30000000000),
+		},
+		"maximum_backoff": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "Maximum backoff interval between retries. Exponential backoff leads to  interval increase. This value is the cap of the interval. Default is 100x  of initial interval.",
+		},
+		"maximum_attempts": {
+			Type:        schema.TypeInt,
+			Optional:    true,
+			Description: "Maximum number of attempts. When exceeded the retries stop even if not  expired yet. If not set or set to 0, it means unlimited, and rely on  activity ScheduleToCloseTimeout to stop.",
+		},
+		"non_retryable_errors": {
+			Type:        schema.TypeList,
+			Optional:    true,
+			Description: "Non-Retriable errors. This is optional. Temporal server will stop retry  if error type matches this list. Note:   - cancellation is not a failure, so it won't be retried,   - only StartToClose or Heartbeat timeouts are retryable.",
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
+		},
+	}
+}
+
+func UnmarshalTriggerRetryPolicy(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	if valueInitialInterval, okInitialInterval := obj["initial_interval"].(string); okInitialInterval && reflect.ValueOf(valueInitialInterval).IsValid() && !reflect.ValueOf(valueInitialInterval).IsZero() {
+		p["initial_interval"] = valueInitialInterval
+	}
+	if valueMaximumBackoff, okMaximumBackoff := obj["maximum_backoff"].(string); okMaximumBackoff && reflect.ValueOf(valueMaximumBackoff).IsValid() && !reflect.ValueOf(valueMaximumBackoff).IsZero() {
+		p["maximum_backoff"] = valueMaximumBackoff
+	}
+	if valueMaximumAttempts, okMaximumAttempts := obj["maximum_attempts"].(int); okMaximumAttempts && reflect.ValueOf(valueMaximumAttempts).IsValid() && !reflect.ValueOf(valueMaximumAttempts).IsZero() {
+		p["maximum_attempts"] = valueMaximumAttempts
+	}
+	if valueNonRetryableErrors, okNonRetryableErrors := obj["non_retryable_errors"].([]interface{}); okNonRetryableErrors && reflect.ValueOf(valueNonRetryableErrors).IsValid() && !reflect.ValueOf(valueNonRetryableErrors).IsZero() {
+		list := valueNonRetryableErrors
+		r := []string{}
+		for _, val := range list {
+			r = append(r, val.(string))
+		}
+		p["non_retryable_errors"] = r
+	}
+	return p, nil
+}
+
+func UnmarshalTriggerRetryPolicyProto(obj map[string]interface{}, m proto.Message) error {
+	d, err := UnmarshalTriggerRetryPolicy(obj)
+	if err != nil {
+		return err
+	}
+	b, err := json.Marshal(d)
+	if err != nil {
+		return err
+	}
+	if err := protojson.Unmarshal(b, m); err != nil {
+		return err
+	}
+	return nil
+}
+
+func MarshalTriggerRetryPolicy(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	p["initial_interval"], _ = obj["initial_interval"].(string)
+	p["maximum_backoff"], _ = obj["maximum_backoff"].(string)
+	if v, ok := obj["maximum_attempts"].(float64); ok {
+		p["maximum_attempts"] = int(v)
+	}
+	if l, ok := obj["non_retryable_errors"].([]interface{}); ok {
+		p["non_retryable_errors"] = []interface{}{}
+		for _, i := range l {
+			d := i.(string)
+			p["non_retryable_errors"] = append(p["non_retryable_errors"].([]interface{}), d)
+		}
+	}
+	return p, nil
+}
+
+func MarshalTriggerRetryPolicyProto(m proto.Message) (map[string]interface{}, error) {
+	obj := map[string]interface{}{}
+	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(b, &obj)
+	if err != nil {
+		return nil, err
+	}
+	return MarshalTriggerRetryPolicy(obj)
+}
 
 func NewProcessSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
@@ -40,7 +135,7 @@ func UnmarshalProcess(obj map[string]interface{}) (map[string]interface{}, error
 	if valueProcess, okProcess := obj["process"].([]interface{}); okProcess && len(valueProcess) > 0 {
 		o := valueProcess[0].(map[string]interface{})
 		if oneOfVal, ok := o["trigger"]; ok {
-			if valueTriggerCollection, okTrigger := oneOfVal.([]interface{}); okTrigger && len(valueTriggerCollection) > 0 {
+			if valueTriggerCollection, okTrigger := oneOfVal.([]interface{}); okTrigger && reflect.ValueOf(valueTriggerCollection).IsValid() && !reflect.ValueOf(valueTriggerCollection).IsZero() && len(valueTriggerCollection) > 0 {
 				if valueTrigger, okTrigger := valueTriggerCollection[0].(map[string]interface{}); okTrigger {
 					msg, err := UnmarshalTrigger(valueTrigger)
 					if err != nil {
@@ -135,14 +230,10 @@ func NewTriggerSchema() map[string]*schema.Schema {
 			Optional:    true,
 			Description: "Maximum execution time of a single Workflow Task. In the majority of cases  there is no need to change this timeout. Note that this timeout is not  related to the overall Workflow duration in any way. It defines for how  long the Workflow can get blocked in the case of a Workflow Worker crash.  Default is 10 seconds. Maximum value allowed by the Temporal Server is 1  minute.",
 		},
-		"arguments": {
-			Type:        schema.TypeList,
-			MaxItems:    1,
+		"json_arguments": {
+			Type:        schema.TypeString,
 			Optional:    true,
-			Description: "A list of arguments to pass to workflow.",
-			Elem: &schema.Resource{
-				Schema: protomeshpb.NewValueSchema(),
-			},
+			Description: "Arguments to pass to the workflow.",
 		},
 		"retry_policy": {
 			Type:        schema.TypeList,
@@ -207,37 +298,31 @@ func NewTriggerSchema() map[string]*schema.Schema {
 
 func UnmarshalTrigger(obj map[string]interface{}) (map[string]interface{}, error) {
 	p := map[string]interface{}{}
-	if valueName, okName := obj["name"].(string); okName {
+	if valueName, okName := obj["name"].(string); okName && reflect.ValueOf(valueName).IsValid() && !reflect.ValueOf(valueName).IsZero() {
 		p["name"] = valueName
 	}
-	if valueTaskQueue, okTaskQueue := obj["task_queue"].(string); okTaskQueue {
+	if valueTaskQueue, okTaskQueue := obj["task_queue"].(string); okTaskQueue && reflect.ValueOf(valueTaskQueue).IsValid() && !reflect.ValueOf(valueTaskQueue).IsZero() {
 		p["task_queue"] = valueTaskQueue
 	}
-	if valueIdPrefix, okIdPrefix := obj["id_prefix"].(string); okIdPrefix {
+	if valueIdPrefix, okIdPrefix := obj["id_prefix"].(string); okIdPrefix && reflect.ValueOf(valueIdPrefix).IsValid() && !reflect.ValueOf(valueIdPrefix).IsZero() {
 		p["id_prefix"] = valueIdPrefix
 	}
-	if valueCronSchedule, okCronSchedule := obj["cron_schedule"].(string); okCronSchedule {
+	if valueCronSchedule, okCronSchedule := obj["cron_schedule"].(string); okCronSchedule && reflect.ValueOf(valueCronSchedule).IsValid() && !reflect.ValueOf(valueCronSchedule).IsZero() {
 		p["cron_schedule"] = valueCronSchedule
 	}
-	if valueExecutionTimeout, okExecutionTimeout := obj["execution_timeout"].(string); okExecutionTimeout {
+	if valueExecutionTimeout, okExecutionTimeout := obj["execution_timeout"].(string); okExecutionTimeout && reflect.ValueOf(valueExecutionTimeout).IsValid() && !reflect.ValueOf(valueExecutionTimeout).IsZero() {
 		p["execution_timeout"] = valueExecutionTimeout
 	}
-	if valueRunTimeout, okRunTimeout := obj["run_timeout"].(string); okRunTimeout {
+	if valueRunTimeout, okRunTimeout := obj["run_timeout"].(string); okRunTimeout && reflect.ValueOf(valueRunTimeout).IsValid() && !reflect.ValueOf(valueRunTimeout).IsZero() {
 		p["run_timeout"] = valueRunTimeout
 	}
-	if valueTaskTimeout, okTaskTimeout := obj["task_timeout"].(string); okTaskTimeout {
+	if valueTaskTimeout, okTaskTimeout := obj["task_timeout"].(string); okTaskTimeout && reflect.ValueOf(valueTaskTimeout).IsValid() && !reflect.ValueOf(valueTaskTimeout).IsZero() {
 		p["task_timeout"] = valueTaskTimeout
 	}
-	if valueArgumentsCollection, okArguments := obj["arguments"].([]interface{}); okArguments && len(valueArgumentsCollection) > 0 {
-		if valueArguments, okArguments := valueArgumentsCollection[0].(map[string]interface{}); okArguments {
-			msg, err := protomeshpb.UnmarshalValue(valueArguments)
-			if err != nil {
-				return nil, err
-			}
-			p["arguments"] = msg
-		}
+	if valueJsonArguments, okJsonArguments := obj["json_arguments"].(string); okJsonArguments && reflect.ValueOf(valueJsonArguments).IsValid() && !reflect.ValueOf(valueJsonArguments).IsZero() {
+		p["json_arguments"] = valueJsonArguments
 	}
-	if valueRetryPolicyCollection, okRetryPolicy := obj["retry_policy"].([]interface{}); okRetryPolicy && len(valueRetryPolicyCollection) > 0 {
+	if valueRetryPolicyCollection, okRetryPolicy := obj["retry_policy"].([]interface{}); okRetryPolicy && reflect.ValueOf(valueRetryPolicyCollection).IsValid() && !reflect.ValueOf(valueRetryPolicyCollection).IsZero() && len(valueRetryPolicyCollection) > 0 {
 		if valueRetryPolicy, okRetryPolicy := valueRetryPolicyCollection[0].(map[string]interface{}); okRetryPolicy {
 			msg, err := UnmarshalTriggerRetryPolicy(valueRetryPolicy)
 			if err != nil {
@@ -249,12 +334,12 @@ func UnmarshalTrigger(obj map[string]interface{}) (map[string]interface{}, error
 	if valueIdSuffix, okIdSuffix := obj["id_suffix"].([]interface{}); okIdSuffix && len(valueIdSuffix) > 0 {
 		o := valueIdSuffix[0].(map[string]interface{})
 		if oneOfVal, ok := o["exact_id_suffix"]; ok {
-			if valueExactIdSuffix, okExactIdSuffix := oneOfVal.(string); okExactIdSuffix {
+			if valueExactIdSuffix, okExactIdSuffix := oneOfVal.(string); okExactIdSuffix && reflect.ValueOf(valueExactIdSuffix).IsValid() && !reflect.ValueOf(valueExactIdSuffix).IsZero() {
 				p["exact_id_suffix"] = valueExactIdSuffix
 			}
 		}
 		if oneOfVal, ok := o["id_suffix_builder"]; ok {
-			if valueIdSuffixBuilder, okIdSuffixBuilder := oneOfVal.(string); okIdSuffixBuilder {
+			if valueIdSuffixBuilder, okIdSuffixBuilder := oneOfVal.(string); okIdSuffixBuilder && reflect.ValueOf(valueIdSuffixBuilder).IsValid() && !reflect.ValueOf(valueIdSuffixBuilder).IsZero() {
 				p["id_suffix_builder"] = valueIdSuffixBuilder
 			}
 		}
@@ -262,7 +347,7 @@ func UnmarshalTrigger(obj map[string]interface{}) (map[string]interface{}, error
 	if valueIfRunning, okIfRunning := obj["if_running"].([]interface{}); okIfRunning && len(valueIfRunning) > 0 {
 		o := valueIfRunning[0].(map[string]interface{})
 		if oneOfVal, ok := o["if_running_action"]; ok {
-			if valueIfRunningAction, okIfRunningAction := oneOfVal.(string); okIfRunningAction {
+			if valueIfRunningAction, okIfRunningAction := oneOfVal.(string); okIfRunningAction && reflect.ValueOf(valueIfRunningAction).IsValid() && !reflect.ValueOf(valueIfRunningAction).IsZero() {
 				p["if_running_action"] = valueIfRunningAction
 			}
 		}
@@ -270,7 +355,7 @@ func UnmarshalTrigger(obj map[string]interface{}) (map[string]interface{}, error
 	if valueOnDrop, okOnDrop := obj["on_drop"].([]interface{}); okOnDrop && len(valueOnDrop) > 0 {
 		o := valueOnDrop[0].(map[string]interface{})
 		if oneOfVal, ok := o["on_drop_action"]; ok {
-			if valueOnDropAction, okOnDropAction := oneOfVal.(string); okOnDropAction {
+			if valueOnDropAction, okOnDropAction := oneOfVal.(string); okOnDropAction && reflect.ValueOf(valueOnDropAction).IsValid() && !reflect.ValueOf(valueOnDropAction).IsZero() {
 				p["on_drop_action"] = valueOnDropAction
 			}
 		}
@@ -302,13 +387,7 @@ func MarshalTrigger(obj map[string]interface{}) (map[string]interface{}, error) 
 	p["execution_timeout"], _ = obj["execution_timeout"].(string)
 	p["run_timeout"], _ = obj["run_timeout"].(string)
 	p["task_timeout"], _ = obj["task_timeout"].(string)
-	if m, ok := obj["arguments"].(map[string]interface{}); ok {
-		d, err := protomeshpb.MarshalValue(m)
-		if err != nil {
-			return nil, err
-		}
-		p["arguments"] = []interface{}{d}
-	}
+	p["json_arguments"], _ = obj["json_arguments"].(string)
 	if m, ok := obj["retry_policy"].(map[string]interface{}); ok {
 		d, err := MarshalTriggerRetryPolicy(m)
 		if err != nil {
@@ -349,97 +428,4 @@ func MarshalTriggerProto(m proto.Message) (map[string]interface{}, error) {
 		return nil, err
 	}
 	return MarshalTrigger(obj)
-}
-
-func NewTriggerRetryPolicySchema() map[string]*schema.Schema {
-	return map[string]*schema.Schema{
-		"initial_interval": {
-			Type:     schema.TypeString,
-			Optional: true,
-			Default:  time.Duration(30000000000),
-		},
-		"maximum_backoff": {
-			Type:        schema.TypeString,
-			Optional:    true,
-			Description: "Maximum backoff interval between retries. Exponential backoff leads to  interval increase. This value is the cap of the interval. Default is 100x  of initial interval.",
-		},
-		"maximum_attempts": {
-			Type:        schema.TypeInt,
-			Optional:    true,
-			Description: "Maximum number of attempts. When exceeded the retries stop even if not  expired yet. If not set or set to 0, it means unlimited, and rely on  activity ScheduleToCloseTimeout to stop.",
-		},
-		"non_retryable_errors": {
-			Type:        schema.TypeList,
-			Optional:    true,
-			Description: "Non-Retriable errors. This is optional. Temporal server will stop retry  if error type matches this list. Note:   - cancellation is not a failure, so it won't be retried,   - only StartToClose or Heartbeat timeouts are retryable.",
-			Elem: &schema.Schema{
-				Type: schema.TypeString,
-			},
-		},
-	}
-}
-
-func UnmarshalTriggerRetryPolicy(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	if valueInitialInterval, okInitialInterval := obj["initial_interval"].(string); okInitialInterval {
-		p["initial_interval"] = valueInitialInterval
-	}
-	if valueMaximumBackoff, okMaximumBackoff := obj["maximum_backoff"].(string); okMaximumBackoff {
-		p["maximum_backoff"] = valueMaximumBackoff
-	}
-	if valueMaximumAttempts, okMaximumAttempts := obj["maximum_attempts"].(int); okMaximumAttempts {
-		p["maximum_attempts"] = valueMaximumAttempts
-	}
-	if valueNonRetryableErrors, okNonRetryableErrors := obj["non_retryable_errors"].([]interface{}); okNonRetryableErrors {
-		list := valueNonRetryableErrors
-		r := []string{}
-		for _, val := range list {
-			r = append(r, val.(string))
-		}
-		p["non_retryable_errors"] = r
-	}
-	return p, nil
-}
-
-func UnmarshalTriggerRetryPolicyProto(obj map[string]interface{}, m proto.Message) error {
-	d, err := UnmarshalTriggerRetryPolicy(obj)
-	if err != nil {
-		return err
-	}
-	b, err := json.Marshal(d)
-	if err != nil {
-		return err
-	}
-	if err := protojson.Unmarshal(b, m); err != nil {
-		return err
-	}
-	return nil
-}
-
-func MarshalTriggerRetryPolicy(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	p["initial_interval"], _ = obj["initial_interval"].(string)
-	p["maximum_backoff"], _ = obj["maximum_backoff"].(string)
-	p["maximum_attempts"], _ = obj["maximum_attempts"].(int)
-	if l, ok := obj["non_retryable_errors"].([]interface{}); ok {
-		p["non_retryable_errors"] = []interface{}{}
-		for _, i := range l {
-			d := i.(string)
-			p["non_retryable_errors"] = append(p["non_retryable_errors"].([]interface{}), d)
-		}
-	}
-	return p, nil
-}
-
-func MarshalTriggerRetryPolicyProto(m proto.Message) (map[string]interface{}, error) {
-	obj := map[string]interface{}{}
-	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(b, &obj)
-	if err != nil {
-		return nil, err
-	}
-	return MarshalTriggerRetryPolicy(obj)
 }
