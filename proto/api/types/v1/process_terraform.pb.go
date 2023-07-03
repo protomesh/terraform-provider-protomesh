@@ -12,101 +12,6 @@ import (
 	"reflect"
 )
 
-func NewTriggerRetryPolicySchema() map[string]*schema.Schema {
-	return map[string]*schema.Schema{
-		"initial_interval": {
-			Type:     schema.TypeString,
-			Optional: true,
-			Default:  time.Duration(30000000000),
-		},
-		"maximum_backoff": {
-			Type:        schema.TypeString,
-			Optional:    true,
-			Description: "Maximum backoff interval between retries. Exponential backoff leads to  interval increase. This value is the cap of the interval. Default is 100x  of initial interval.",
-		},
-		"maximum_attempts": {
-			Type:        schema.TypeInt,
-			Optional:    true,
-			Description: "Maximum number of attempts. When exceeded the retries stop even if not  expired yet. If not set or set to 0, it means unlimited, and rely on  activity ScheduleToCloseTimeout to stop.",
-		},
-		"non_retryable_errors": {
-			Type:        schema.TypeList,
-			Optional:    true,
-			Description: "Non-Retriable errors. This is optional. Temporal server will stop retry  if error type matches this list. Note:   - cancellation is not a failure, so it won't be retried,   - only StartToClose or Heartbeat timeouts are retryable.",
-			Elem: &schema.Schema{
-				Type: schema.TypeString,
-			},
-		},
-	}
-}
-
-func UnmarshalTriggerRetryPolicy(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	if valueInitialInterval, okInitialInterval := obj["initial_interval"].(string); okInitialInterval && reflect.ValueOf(valueInitialInterval).IsValid() && !reflect.ValueOf(valueInitialInterval).IsZero() {
-		p["initial_interval"] = valueInitialInterval
-	}
-	if valueMaximumBackoff, okMaximumBackoff := obj["maximum_backoff"].(string); okMaximumBackoff && reflect.ValueOf(valueMaximumBackoff).IsValid() && !reflect.ValueOf(valueMaximumBackoff).IsZero() {
-		p["maximum_backoff"] = valueMaximumBackoff
-	}
-	if valueMaximumAttempts, okMaximumAttempts := obj["maximum_attempts"].(int); okMaximumAttempts && reflect.ValueOf(valueMaximumAttempts).IsValid() && !reflect.ValueOf(valueMaximumAttempts).IsZero() {
-		p["maximum_attempts"] = valueMaximumAttempts
-	}
-	if valueNonRetryableErrors, okNonRetryableErrors := obj["non_retryable_errors"].([]interface{}); okNonRetryableErrors && reflect.ValueOf(valueNonRetryableErrors).IsValid() && !reflect.ValueOf(valueNonRetryableErrors).IsZero() {
-		list := valueNonRetryableErrors
-		r := []string{}
-		for _, val := range list {
-			r = append(r, val.(string))
-		}
-		p["non_retryable_errors"] = r
-	}
-	return p, nil
-}
-
-func UnmarshalTriggerRetryPolicyProto(obj map[string]interface{}, m proto.Message) error {
-	d, err := UnmarshalTriggerRetryPolicy(obj)
-	if err != nil {
-		return err
-	}
-	b, err := json.Marshal(d)
-	if err != nil {
-		return err
-	}
-	if err := protojson.Unmarshal(b, m); err != nil {
-		return err
-	}
-	return nil
-}
-
-func MarshalTriggerRetryPolicy(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	p["initial_interval"], _ = obj["initial_interval"].(string)
-	p["maximum_backoff"], _ = obj["maximum_backoff"].(string)
-	if v, ok := obj["maximum_attempts"].(float64); ok {
-		p["maximum_attempts"] = int(v)
-	}
-	if l, ok := obj["non_retryable_errors"].([]interface{}); ok {
-		p["non_retryable_errors"] = []interface{}{}
-		for _, i := range l {
-			d := i.(string)
-			p["non_retryable_errors"] = append(p["non_retryable_errors"].([]interface{}), d)
-		}
-	}
-	return p, nil
-}
-
-func MarshalTriggerRetryPolicyProto(m proto.Message) (map[string]interface{}, error) {
-	obj := map[string]interface{}{}
-	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(b, &obj)
-	if err != nil {
-		return nil, err
-	}
-	return MarshalTriggerRetryPolicy(obj)
-}
-
 func NewProcessSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"process": {
@@ -428,4 +333,99 @@ func MarshalTriggerProto(m proto.Message) (map[string]interface{}, error) {
 		return nil, err
 	}
 	return MarshalTrigger(obj)
+}
+
+func NewTriggerRetryPolicySchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		"initial_interval": {
+			Type:     schema.TypeString,
+			Optional: true,
+			Default:  time.Duration(30000000000),
+		},
+		"maximum_backoff": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "Maximum backoff interval between retries. Exponential backoff leads to  interval increase. This value is the cap of the interval. Default is 100x  of initial interval.",
+		},
+		"maximum_attempts": {
+			Type:        schema.TypeInt,
+			Optional:    true,
+			Description: "Maximum number of attempts. When exceeded the retries stop even if not  expired yet. If not set or set to 0, it means unlimited, and rely on  activity ScheduleToCloseTimeout to stop.",
+		},
+		"non_retryable_errors": {
+			Type:        schema.TypeList,
+			Optional:    true,
+			Description: "Non-Retriable errors. This is optional. Temporal server will stop retry  if error type matches this list. Note:   - cancellation is not a failure, so it won't be retried,   - only StartToClose or Heartbeat timeouts are retryable.",
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
+		},
+	}
+}
+
+func UnmarshalTriggerRetryPolicy(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	if valueInitialInterval, okInitialInterval := obj["initial_interval"].(string); okInitialInterval && reflect.ValueOf(valueInitialInterval).IsValid() && !reflect.ValueOf(valueInitialInterval).IsZero() {
+		p["initial_interval"] = valueInitialInterval
+	}
+	if valueMaximumBackoff, okMaximumBackoff := obj["maximum_backoff"].(string); okMaximumBackoff && reflect.ValueOf(valueMaximumBackoff).IsValid() && !reflect.ValueOf(valueMaximumBackoff).IsZero() {
+		p["maximum_backoff"] = valueMaximumBackoff
+	}
+	if valueMaximumAttempts, okMaximumAttempts := obj["maximum_attempts"].(int); okMaximumAttempts && reflect.ValueOf(valueMaximumAttempts).IsValid() && !reflect.ValueOf(valueMaximumAttempts).IsZero() {
+		p["maximum_attempts"] = valueMaximumAttempts
+	}
+	if valueNonRetryableErrors, okNonRetryableErrors := obj["non_retryable_errors"].([]interface{}); okNonRetryableErrors && reflect.ValueOf(valueNonRetryableErrors).IsValid() && !reflect.ValueOf(valueNonRetryableErrors).IsZero() {
+		list := valueNonRetryableErrors
+		r := []string{}
+		for _, val := range list {
+			r = append(r, val.(string))
+		}
+		p["non_retryable_errors"] = r
+	}
+	return p, nil
+}
+
+func UnmarshalTriggerRetryPolicyProto(obj map[string]interface{}, m proto.Message) error {
+	d, err := UnmarshalTriggerRetryPolicy(obj)
+	if err != nil {
+		return err
+	}
+	b, err := json.Marshal(d)
+	if err != nil {
+		return err
+	}
+	if err := protojson.Unmarshal(b, m); err != nil {
+		return err
+	}
+	return nil
+}
+
+func MarshalTriggerRetryPolicy(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	p["initial_interval"], _ = obj["initial_interval"].(string)
+	p["maximum_backoff"], _ = obj["maximum_backoff"].(string)
+	if v, ok := obj["maximum_attempts"].(float64); ok {
+		p["maximum_attempts"] = int(v)
+	}
+	if l, ok := obj["non_retryable_errors"].([]interface{}); ok {
+		p["non_retryable_errors"] = []interface{}{}
+		for _, i := range l {
+			d := i.(string)
+			p["non_retryable_errors"] = append(p["non_retryable_errors"].([]interface{}), d)
+		}
+	}
+	return p, nil
+}
+
+func MarshalTriggerRetryPolicyProto(m proto.Message) (map[string]interface{}, error) {
+	obj := map[string]interface{}{}
+	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(b, &obj)
+	if err != nil {
+		return nil, err
+	}
+	return MarshalTriggerRetryPolicy(obj)
 }

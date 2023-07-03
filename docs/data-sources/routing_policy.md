@@ -60,6 +60,7 @@ Read-Only:
 Read-Only:
 
 - `match_prefix` (String)
+- `prefix_rewrite` (String)
 - `target_service` (String)
 - `timeout` (String)
 

@@ -57,6 +57,7 @@ Optional:
 Optional:
 
 - `match_prefix` (String) Path prefix in the request to match.
+- `prefix_rewrite` (String) Prefix rewrite to apply to the path before forwarding the request to the service.
 - `target_service` (String) Target service name when this route matches.
 - `timeout` (String) Timeout to connect to service in this route.
 
