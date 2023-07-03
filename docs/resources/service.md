@@ -34,6 +34,7 @@ Service defines an upstream cluster to receive routed requests from HTTP Ingress
 Optional:
 
 - `connect_timeout` (String) Timeout to connect to upstream.
+- `enable_tls_transport` (Boolean) Enable TLS transport to connect to upstream.
 - `instance_application_protocol_options` (Block List, Max: 1) (see [below for nested schema](#nestedblock--node--instance_application_protocol_options))
 - `service_name` (String) Service name (or 'cluster' name in Envoy xDS).
 - `xds_cluster_name` (String) XDS cluster name: must be the same of the envoy config to be matched by  xDS server.
