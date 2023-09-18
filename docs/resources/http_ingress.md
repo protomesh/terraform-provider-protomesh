@@ -33,6 +33,7 @@ HTTP Ingress (a.k.a reverse proxy). Usually this ingress is the upstream of a ne
 
 Optional:
 
+- `access_log_stdout_format` (String) Access log stdout format
 - `http_filters` (Block List) Http filters to apply to the ingress listener. (see [below for nested schema](#nestedblock--node--http_filters))
 - `ingress_name` (String) Ingress name (used as route config name for the route specifier).
 - `listen_port` (Number) Ingress port to listen for incoming requests.

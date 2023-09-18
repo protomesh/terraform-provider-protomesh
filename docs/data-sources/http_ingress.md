@@ -36,6 +36,7 @@ description: |-
 
 Read-Only:
 
+- `access_log_stdout_format` (String)
 - `http_filters` (List of Object) (see [below for nested schema](#nestedobjatt--node--http_filters))
 - `ingress_name` (String)
 - `listen_port` (Number)
