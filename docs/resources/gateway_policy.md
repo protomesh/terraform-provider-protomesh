@@ -34,6 +34,7 @@ Defines a gateway policy
 Optional:
 
 - `handlers` (Block List) Handlers are the handlers to invoke when the source matches.  Each result of each handler is passed to the next handler.  When an error occurs, the error is returned to the client. (see [below for nested schema](#nestedblock--policy--handlers))
+- `lambda_stream_signal_header_key` (String) This field specifies which header or gRPC incoming metadata key to use  to determine if the handler should be invoked.  It uses the PubSub drivers from protomesh.
 - `source` (Block List, Max: 1) (see [below for nested schema](#nestedblock--policy--source))
 
 <a id="nestedblock--policy--handlers"></a>

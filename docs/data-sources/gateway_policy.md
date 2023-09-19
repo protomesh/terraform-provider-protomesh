@@ -37,6 +37,7 @@ description: |-
 Read-Only:
 
 - `handlers` (List of Object) (see [below for nested schema](#nestedobjatt--policy--handlers))
+- `lambda_stream_signal_header_key` (String)
 - `source` (List of Object) (see [below for nested schema](#nestedobjatt--policy--source))
 
 <a id="nestedobjatt--policy--handlers"></a>

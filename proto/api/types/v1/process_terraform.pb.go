@@ -12,6 +12,92 @@ import (
 	"reflect"
 )
 
+func NewProcessSchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		"process": {
+			Type:     schema.TypeList,
+			MaxItems: 1,
+			Optional: true,
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"trigger": {
+						Type:        schema.TypeList,
+						MaxItems:    1,
+						Optional:    true,
+						Description: "Trigger process.",
+						Elem: &schema.Resource{
+							Schema: NewTriggerSchema(),
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func UnmarshalProcess(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	if valueProcess, okProcess := obj["process"].([]interface{}); okProcess && len(valueProcess) > 0 {
+		o := valueProcess[0].(map[string]interface{})
+		if oneOfVal, ok := o["trigger"]; ok {
+			if valueTriggerCollection, okTrigger := oneOfVal.([]interface{}); okTrigger && reflect.ValueOf(valueTriggerCollection).IsValid() && !reflect.ValueOf(valueTriggerCollection).IsZero() && len(valueTriggerCollection) > 0 {
+				if valueTrigger, okTrigger := valueTriggerCollection[0].(map[string]interface{}); okTrigger {
+					msg, err := UnmarshalTrigger(valueTrigger)
+					if err != nil {
+						return nil, err
+					}
+					p["trigger"] = msg
+				}
+			}
+		}
+	}
+	return p, nil
+}
+
+func UnmarshalProcessProto(obj map[string]interface{}, m proto.Message) error {
+	d, err := UnmarshalProcess(obj)
+	if err != nil {
+		return err
+	}
+	b, err := json.Marshal(d)
+	if err != nil {
+		return err
+	}
+	if err := protojson.Unmarshal(b, m); err != nil {
+		return err
+	}
+	return nil
+}
+
+func MarshalProcess(obj map[string]interface{}) (map[string]interface{}, error) {
+	p := map[string]interface{}{}
+	p["process"] = []interface{}{}
+	if _, ok := obj["trigger"]; ok {
+		p["process"] = append(p["process"].([]interface{}), map[string]interface{}{})
+		if m, ok := obj["trigger"].(map[string]interface{}); ok {
+			d, err := MarshalTrigger(m)
+			if err != nil {
+				return nil, err
+			}
+			p["process"].([]interface{})[0].(map[string]interface{})["trigger"] = []interface{}{d}
+		}
+	}
+	return p, nil
+}
+
+func MarshalProcessProto(m proto.Message) (map[string]interface{}, error) {
+	obj := map[string]interface{}{}
+	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(b, &obj)
+	if err != nil {
+		return nil, err
+	}
+	return MarshalProcess(obj)
+}
+
 func NewTriggerSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 		"name": {
@@ -342,90 +428,4 @@ func MarshalTriggerRetryPolicyProto(m proto.Message) (map[string]interface{}, er
 		return nil, err
 	}
 	return MarshalTriggerRetryPolicy(obj)
-}
-
-func NewProcessSchema() map[string]*schema.Schema {
-	return map[string]*schema.Schema{
-		"process": {
-			Type:     schema.TypeList,
-			MaxItems: 1,
-			Optional: true,
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-					"trigger": {
-						Type:        schema.TypeList,
-						MaxItems:    1,
-						Optional:    true,
-						Description: "Trigger process.",
-						Elem: &schema.Resource{
-							Schema: NewTriggerSchema(),
-						},
-					},
-				},
-			},
-		},
-	}
-}
-
-func UnmarshalProcess(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	if valueProcess, okProcess := obj["process"].([]interface{}); okProcess && len(valueProcess) > 0 {
-		o := valueProcess[0].(map[string]interface{})
-		if oneOfVal, ok := o["trigger"]; ok {
-			if valueTriggerCollection, okTrigger := oneOfVal.([]interface{}); okTrigger && reflect.ValueOf(valueTriggerCollection).IsValid() && !reflect.ValueOf(valueTriggerCollection).IsZero() && len(valueTriggerCollection) > 0 {
-				if valueTrigger, okTrigger := valueTriggerCollection[0].(map[string]interface{}); okTrigger {
-					msg, err := UnmarshalTrigger(valueTrigger)
-					if err != nil {
-						return nil, err
-					}
-					p["trigger"] = msg
-				}
-			}
-		}
-	}
-	return p, nil
-}
-
-func UnmarshalProcessProto(obj map[string]interface{}, m proto.Message) error {
-	d, err := UnmarshalProcess(obj)
-	if err != nil {
-		return err
-	}
-	b, err := json.Marshal(d)
-	if err != nil {
-		return err
-	}
-	if err := protojson.Unmarshal(b, m); err != nil {
-		return err
-	}
-	return nil
-}
-
-func MarshalProcess(obj map[string]interface{}) (map[string]interface{}, error) {
-	p := map[string]interface{}{}
-	p["process"] = []interface{}{}
-	if _, ok := obj["trigger"]; ok {
-		p["process"] = append(p["process"].([]interface{}), map[string]interface{}{})
-		if m, ok := obj["trigger"].(map[string]interface{}); ok {
-			d, err := MarshalTrigger(m)
-			if err != nil {
-				return nil, err
-			}
-			p["process"].([]interface{})[0].(map[string]interface{})["trigger"] = []interface{}{d}
-		}
-	}
-	return p, nil
-}
-
-func MarshalProcessProto(m proto.Message) (map[string]interface{}, error) {
-	obj := map[string]interface{}{}
-	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(m)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(b, &obj)
-	if err != nil {
-		return nil, err
-	}
-	return MarshalProcess(obj)
 }
