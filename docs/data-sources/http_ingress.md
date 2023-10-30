@@ -101,6 +101,7 @@ Read-Only:
 - `forward` (Boolean)
 - `from_headers` (List of Object) (see [below for nested schema](#nestedobjatt--node--http_filters--filter--jwt_authn--providers--from_headers))
 - `issuer` (String)
+- `local_jwks` (List of Object) (see [below for nested schema](#nestedobjatt--node--http_filters--filter--jwt_authn--providers--local_jwks))
 - `provider_name` (String)
 - `remote_jwks` (List of Object) (see [below for nested schema](#nestedobjatt--node--http_filters--filter--jwt_authn--providers--remote_jwks))
 
@@ -120,6 +121,15 @@ Read-Only:
 
 - `header_name` (String)
 - `value_prefix` (String)
+
+
+<a id="nestedobjatt--node--http_filters--filter--jwt_authn--providers--local_jwks"></a>
+### Nested Schema for `node.http_filters.filter.jwt_authn.providers.remote_jwks`
+
+Read-Only:
+
+- `filename` (String)
+- `inline_string` (String)
 
 
 <a id="nestedobjatt--node--http_filters--filter--jwt_authn--providers--remote_jwks"></a>

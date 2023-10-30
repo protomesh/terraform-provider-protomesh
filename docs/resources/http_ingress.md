@@ -102,6 +102,7 @@ Optional:
 - `audiences` (List of String) The list of JWT audiences are allowed to access.  A JWT containing any of these audiences will be accepted.  If not specified, will not check audiences in the token.
 - `claim_to_headers` (Block List) Add JWT claim to HTTP Header Specify the claim name you want to  copy in which HTTP header. For examples, following config:  The claim must be of type; string, int, double, bool.  Array type claims are not supported. (see [below for nested schema](#nestedblock--node--http_filters--filter--jwt_authn--providers--claim_to_headers))
 - `from_headers` (Block List) Define where to extract the JWT from an HTTP request. (see [below for nested schema](#nestedblock--node--http_filters--filter--jwt_authn--providers--from_headers))
+- `local_jwks` (Block List, Max: 1) JWKS can be fetched from local file system. (see [below for nested schema](#nestedblock--node--http_filters--filter--jwt_authn--providers--local_jwks))
 - `remote_jwks` (Block List, Max: 1) JWKS can be fetched from remote server via HTTP/HTTPS.  This field specifies the remote HTTP URI and how the fetched JWKS should be cached. (see [below for nested schema](#nestedblock--node--http_filters--filter--jwt_authn--providers--remote_jwks))
 
 <a id="nestedblock--node--http_filters--filter--jwt_authn--providers--claim_to_headers"></a>
@@ -120,6 +121,15 @@ Required:
 
 - `header_name` (String) This is the header name to get the JWT. Example: 'Authorization'
 - `value_prefix` (String) ValuePrefix specifies a prefix in the value before the JWT token to be removed.  Example: 'Bearer '
+
+
+<a id="nestedblock--node--http_filters--filter--jwt_authn--providers--local_jwks"></a>
+### Nested Schema for `node.http_filters.filter.jwt_authn.providers.local_jwks`
+
+Optional:
+
+- `filename` (String) Local file path to the JWKS file.
+- `inline_string` (String) Content of the JWKS file.
 
 
 <a id="nestedblock--node--http_filters--filter--jwt_authn--providers--remote_jwks"></a>
